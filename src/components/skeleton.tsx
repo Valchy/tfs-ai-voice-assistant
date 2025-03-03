@@ -46,3 +46,22 @@ export function TableSkeleton({ rows = 5, cols = 4, className }: { rows?: number
 		</div>
 	);
 }
+
+// Stats skeleton
+export function StatsSkeleton() {
+	return (
+		<div className="mt-4 grid gap-8 sm:grid-cols-2 xl:grid-cols-4">
+			{Array(4)
+				.fill(0)
+				.map((_, i) => (
+					<div key={i} className="rounded-lg border border-zinc-200 p-6 dark:border-zinc-800">
+						<div className="flex items-center justify-between">
+							<Skeleton className="h-4 w-24" />
+							<Skeleton className="h-4 w-12" />
+						</div>
+						<Skeleton className="mt-3 h-8 w-20" />
+					</div>
+				))}
+		</div>
+	);
+}

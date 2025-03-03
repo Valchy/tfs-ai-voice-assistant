@@ -5,7 +5,7 @@ import { Stat } from '@/app/stat';
 import { Heading, Subheading } from '@/components/heading';
 import { PageWrapper } from '@/components/page-wrapper';
 import { Select } from '@/components/select';
-import { Skeleton, TableSkeleton } from '@/components/skeleton';
+import { StatsSkeleton, TableSkeleton } from '@/components/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/table';
 import { getCallerHistory } from '@/data';
 import { Suspense } from 'react';
@@ -56,25 +56,6 @@ async function CallerHistoryContent() {
 	);
 }
 
-// Stats skeleton
-function StatsSkeleton() {
-	return (
-		<div className="mt-4 grid gap-8 sm:grid-cols-2 xl:grid-cols-4">
-			{Array(4)
-				.fill(0)
-				.map((_, i) => (
-					<div key={i} className="rounded-lg border border-zinc-200 p-6 dark:border-zinc-800">
-						<div className="flex items-center justify-between">
-							<Skeleton className="h-4 w-24" />
-							<Skeleton className="h-4 w-12" />
-						</div>
-						<Skeleton className="mt-3 h-8 w-20" />
-					</div>
-				))}
-		</div>
-	);
-}
-
 export default function Home() {
 	return (
 		<PageWrapper title={<Heading>Good afternoon, Valeri</Heading>}>
@@ -95,7 +76,7 @@ export default function Home() {
 					<>
 						<StatsSkeleton />
 						<Subheading className="mt-14">Recent calls</Subheading>
-						<TableSkeleton rows={5} cols={4} />
+						<TableSkeleton rows={5} cols={1} />
 					</>
 				}
 			>

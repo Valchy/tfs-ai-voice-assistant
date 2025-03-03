@@ -55,7 +55,7 @@ async function ClientsTableContent() {
 export default function ClientsPage() {
 	return (
 		<PageWrapper title={<Heading>Clients</Heading>}>
-			<Suspense fallback={<TableSkeleton rows={8} cols={5} className="mt-8" />}>
+			<Suspense fallback={<TableSkeleton rows={5} cols={1} className="mt-8" />}>
 				<ClientsTableContent />
 			</Suspense>
 		</PageWrapper>
