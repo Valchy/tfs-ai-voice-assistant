@@ -5,26 +5,17 @@ import { Stat } from '@/app/stat';
 import { Heading, Subheading } from '@/components/heading';
 import { PageWrapper } from '@/components/page-wrapper';
 import { Select } from '@/components/select';
+import { Skeleton, TableSkeleton } from '@/components/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/table';
 import { getCallerHistory } from '@/data';
+import { Suspense } from 'react';
 
-export default async function Home() {
-	let callerHistory = await getCallerHistory();
+// Separate data-fetching component
+async function CallerHistoryContent() {
+	const callerHistory = await getCallerHistory();
 
 	return (
-		<PageWrapper title={<Heading>Good afternoon, Valeri</Heading>}>
-			<div className="mt-8 flex items-end justify-between">
-				<Subheading>Overview</Subheading>
-				<div>
-					<Select name="period">
-						<option value="last_week">Last week</option>
-						<option value="last_two">Last two weeks</option>
-						<option value="last_month">Last month</option>
-						<option value="last_quarter">Last quarter</option>
-					</Select>
-				</div>
-			</div>
-
+		<>
 			<div className="mt-4 grid gap-8 sm:grid-cols-2 xl:grid-cols-4">
 				<Stat title="Total calls" value={callerHistory.length.toString()} change="+4.5%" />
 				<Stat title="Average call duration" value="3m 24s" change="+2.1%" />
@@ -61,6 +52,55 @@ export default async function Home() {
 					)}
 				</TableBody>
 			</Table>
+		</>
+	);
+}
+
+// Stats skeleton
+function StatsSkeleton() {
+	return (
+		<div className="mt-4 grid gap-8 sm:grid-cols-2 xl:grid-cols-4">
+			{Array(4)
+				.fill(0)
+				.map((_, i) => (
+					<div key={i} className="rounded-lg border border-zinc-200 p-6 dark:border-zinc-800">
+						<div className="flex items-center justify-between">
+							<Skeleton className="h-4 w-24" />
+							<Skeleton className="h-4 w-12" />
+						</div>
+						<Skeleton className="mt-3 h-8 w-20" />
+					</div>
+				))}
+		</div>
+	);
+}
+
+export default function Home() {
+	return (
+		<PageWrapper title={<Heading>Good afternoon, Valeri</Heading>}>
+			<div className="mt-8 flex items-end justify-between">
+				<Subheading>Overview</Subheading>
+				<div>
+					<Select name="period">
+						<option value="last_week">Last week</option>
+						<option value="last_two">Last two weeks</option>
+						<option value="last_month">Last month</option>
+						<option value="last_quarter">Last quarter</option>
+					</Select>
+				</div>
+			</div>
+
+			<Suspense
+				fallback={
+					<>
+						<StatsSkeleton />
+						<Subheading className="mt-14">Recent calls</Subheading>
+						<TableSkeleton rows={5} cols={4} />
+					</>
+				}
+			>
+				<CallerHistoryContent />
+			</Suspense>
 		</PageWrapper>
 	);
 }
