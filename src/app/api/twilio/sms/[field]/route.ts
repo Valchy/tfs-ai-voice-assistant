@@ -27,11 +27,10 @@ export async function POST(request: NextRequest, { params }: { params: { field: 
 			);
 		}
 
-		// Parse the request body
-		const body = await request.json();
-
-		// Extract required parameters
-		const { phone, value } = body;
+		// Get parameters from URL query instead of body
+		const url = new URL(request.url);
+		const phone = url.searchParams.get('phone');
+		const value = url.searchParams.get('value');
 
 		// Validate required parameters
 		if (!phone) {
@@ -44,7 +43,7 @@ export async function POST(request: NextRequest, { params }: { params: { field: 
 			);
 		}
 
-		if (value === undefined) {
+		if (value === null) {
 			return NextResponse.json(
 				{
 					success: false,

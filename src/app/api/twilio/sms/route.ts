@@ -11,53 +11,15 @@ const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
 const apiKey = process.env.AIRTABLE_API_KEY;
 const baseId = process.env.AIRTABLE_BASE_ID;
 
-// Get API credentials from environment variables
-const API_USERNAME = process.env.API_USERNAME;
-const API_PASSWORD = process.env.API_PASSWORD;
-
 // Client type definition with index signature
 type ClientRecord = {
 	id: string;
 	[key: string]: any;
 };
 
-// Helper function to check basic auth credentials
-function isAuthenticated(request: NextRequest): boolean {
-	// Skip auth check if credentials are not configured
-	if (!API_USERNAME || !API_PASSWORD) {
-		console.warn('API authentication is not configured. Set API_USERNAME and API_PASSWORD environment variables.');
-		return true;
-	}
-
-	// Get the Authorization header
-	const authHeader = request.headers.get('Authorization');
-	if (!authHeader || !authHeader.startsWith('Basic ')) {
-		return false;
-	}
-
-	// Extract and decode credentials
-	const base64Credentials = authHeader.split(' ')[1];
-	const credentials = Buffer.from(base64Credentials, 'base64').toString('utf-8');
-	const [username, password] = credentials.split(':');
-
-	// Check if credentials match
-	return username === API_USERNAME && password === API_PASSWORD;
-}
-
 // GET method to retrieve a client by phone number
 export async function GET(request: NextRequest) {
 	try {
-		// Check authentication first
-		if (!isAuthenticated(request)) {
-			return NextResponse.json(
-				{
-					success: false,
-					error: 'Unauthorized access',
-				},
-				{ status: 401, headers: { 'WWW-Authenticate': 'Basic' } },
-			);
-		}
-
 		// Validate Airtable environment variables
 		if (!apiKey || !baseId) {
 			return NextResponse.json(
@@ -155,17 +117,6 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
 	try {
-		// Check authentication first
-		if (!isAuthenticated(request)) {
-			return NextResponse.json(
-				{
-					success: false,
-					error: 'Unauthorized access',
-				},
-				{ status: 401, headers: { 'WWW-Authenticate': 'Basic' } },
-			);
-		}
-
 		// Ensure Twilio credentials are available
 		if (!accountSid || !authToken || !twilioPhoneNumber) {
 			return NextResponse.json(
