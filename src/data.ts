@@ -25,25 +25,10 @@ async function fetchAirtableData<T>(endpoint: string): Promise<T[]> {
 	try {
 		console.log(`Fetching data from API endpoint ${endpoint}:`, new Date().toISOString());
 
-		// Dynamically determine the base URL based on environment
-		// In Vercel, we should use the deployment URL or default to relative path
-		let baseUrl = '';
-
-		// For Vercel deployments
-		if (process.env.NEXT_PUBLIC_VERCEL_URL) {
-			baseUrl = `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`;
-		}
-		// For localhost development
-		else if (process.env.NODE_ENV === 'development') {
-			baseUrl = 'http://localhost:3000';
-		}
-		// Default to relative path which should work in most cases
-		// An empty baseUrl means we'll use a relative URL, which works in most deployments
-
 		// Add a cache-busting parameter to ensure we always get fresh data
 		const cacheBuster = `cacheBust=${Date.now()}`;
-		// Use relative URL if baseUrl is empty (better compatibility)
-		const url = `https://app.valchy.ai/api/airtable/${endpoint}?${cacheBuster}`;
+		const baseUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://app.valchy.ai';
+		const url = `${baseUrl}/api/airtable/${endpoint}?${cacheBuster}`;
 
 		console.log('Fetching from URL:', url);
 
@@ -55,7 +40,7 @@ async function fetchAirtableData<T>(endpoint: string): Promise<T[]> {
 			// Force Next.js to refetch every time
 			cache: 'no-store',
 			// Also disable caching
-			next: { revalidate: 0 },
+			// next: { revalidate: 0 },
 		});
 
 		console.log('API response status:', response.status);
