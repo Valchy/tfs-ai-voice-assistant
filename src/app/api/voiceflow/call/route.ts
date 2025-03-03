@@ -31,11 +31,8 @@ export async function GET(request: NextRequest) {
 			);
 		}
 
-		// Additional parameters from the URL if needed
-		const fraudAlert = url.searchParams.get('fraud_alert') === 'true';
-
 		// Call the Voiceflow API
-		const response = await fetch('https://runtime-api.voiceflow.com/v1alpha1/phone-number/67c3838f5f78c85c1ac6646b/outbound', {
+		const response = await fetch('https://runtime-api.voiceflow.com/v1alpha1/phone-number/6762928d7edb2c774af35435/outbound', {
 			method: 'POST',
 			headers: {
 				'Authorization': VOICEFLOW_DM_API_KEY,
@@ -43,16 +40,14 @@ export async function GET(request: NextRequest) {
 			},
 			body: JSON.stringify({
 				to: phoneNumber,
-				variables: {
-					fraud_alert: fraudAlert,
-				},
+				variables: { fraud_alert: 'yes' },
 			}),
 		});
 
-		// Parse and return the response
-		const data = await response.json();
-
 		if (!response.ok) {
+			// Parse and return the response
+			const data = await response.json();
+
 			return NextResponse.json(
 				{
 					success: false,
@@ -63,10 +58,7 @@ export async function GET(request: NextRequest) {
 			);
 		}
 
-		return NextResponse.json({
-			success: true,
-			data,
-		});
+		return NextResponse.json({ success: true });
 	} catch (error: any) {
 		console.error('Error initiating Voiceflow call:', error);
 

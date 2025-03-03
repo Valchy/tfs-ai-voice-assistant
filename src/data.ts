@@ -84,6 +84,53 @@ async function fetchAirtableData<T>(endpoint: string): Promise<T[]> {
 	}
 }
 
+// Function to initiate a call via the Voiceflow API
+export async function initiateVoiceflowCall(phoneNumber: string): Promise<boolean> {
+	try {
+		console.log(`Initiating call to phone number: ${phoneNumber}`);
+
+		// Build the base URL for the call endpoint
+		const baseUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://app.valchy.ai';
+		const url = `${baseUrl}/api/voiceflow/call?phone=${encodeURIComponent(phoneNumber)}`;
+
+		// Get the auth credentials from environment variables
+		const username = process.env.NEXT_PUBLIC_BASIC_AUTH_USERNAME;
+		const password = process.env.NEXT_PUBLIC_BASIC_AUTH_PASSWORD;
+
+		// Create headers object with content type
+		const headers: HeadersInit = {
+			'Content-Type': 'application/json',
+		};
+
+		// Add Basic Auth header if credentials are available
+		if (username && password) {
+			const base64Credentials = base64Encode(`${username}:${password}`);
+			headers['Authorization'] = `Basic ${base64Credentials}`;
+		}
+
+		const response = await fetch(url, {
+			method: 'GET',
+			headers,
+			cache: 'no-store',
+		});
+
+		console.log('Call API response status:', response.status);
+
+		if (!response.ok) {
+			const errorData = await response.json().catch(() => null);
+			console.error('Call API error details:', errorData);
+			throw new Error(`Failed to initiate call: ${response.status} ${response.statusText}`);
+		}
+
+		const data = await response.json();
+		console.log('Call API response:', data);
+		return data.success || false;
+	} catch (error) {
+		console.error('Error initiating call:', error);
+		return false;
+	}
+}
+
 export async function getCallerHistory(): Promise<CallerHistoryItem[]> {
 	return fetchAirtableData<CallerHistoryItem>('get-caller-history');
 }

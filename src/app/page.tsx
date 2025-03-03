@@ -36,7 +36,7 @@ async function CallerHistoryContent() {
 				<TableBody>
 					{callerHistory.length > 0 ? (
 						callerHistory.map(caller => (
-							<TableRow key={caller.id} href={`/clients/${caller.id}`} title={`Caller: ${caller.Name || '-'}`}>
+							<TableRow key={caller.id} title={`Caller: ${caller.Name || '-'}`}>
 								<TableCell>{caller.Name || '-'}</TableCell>
 								<TableCell>{caller.Phone || '-'}</TableCell>
 								<TableCell>{caller.Date || '-'}</TableCell>
