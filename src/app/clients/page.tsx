@@ -1,50 +1,50 @@
-import { Avatar } from '@/components/avatar';
-import { Button } from '@/components/button';
 import { Heading } from '@/components/heading';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/table';
-import { getOrders } from '@/data';
+import { getCallerHistory } from '@/data';
 import type { Metadata } from 'next';
+import { ClientWrapper } from './client-wrapper';
 
 export const metadata: Metadata = {
 	title: 'Clients',
 };
 
-export default async function Orders() {
-	let orders = await getOrders();
+export default async function ClientsPage() {
+	const callerHistory = await getCallerHistory();
+
+	console.log(`Rendering client page with ${callerHistory.length} history records`);
 
 	return (
-		<>
-			<div className="flex items-end justify-between gap-4">
-				<Heading>Clients</Heading>
-				<Button className="-my-0.5">Create order</Button>
-			</div>
+		<ClientWrapper>
+			<Heading>Clients</Heading>
+
 			<Table className="mt-8 [--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
 				<TableHead>
 					<TableRow>
-						<TableHeader>Order number</TableHeader>
-						<TableHeader>Purchase date</TableHeader>
-						<TableHeader>Customer</TableHeader>
-						<TableHeader>Event</TableHeader>
-						<TableHeader className="text-right">Amount</TableHeader>
+						<TableHeader>Name</TableHeader>
+						<TableHeader>Phone Number</TableHeader>
+						<TableHeader>Call Date</TableHeader>
+						<TableHeader>Notes</TableHeader>
 					</TableRow>
 				</TableHead>
 				<TableBody>
-					{orders.map(order => (
-						<TableRow key={order.id} href={order.url} title={`Order #${order.id}`}>
-							<TableCell>{order.id}</TableCell>
-							<TableCell className="text-zinc-500">{order.date}</TableCell>
-							<TableCell>{order.customer.name}</TableCell>
-							<TableCell>
-								<div className="flex items-center gap-2">
-									<Avatar src={order.event.thumbUrl} className="size-6" />
-									<span>{order.event.name}</span>
-								</div>
+					{callerHistory.length > 0 ? (
+						callerHistory.map(caller => (
+							<TableRow key={caller.id} href={`/clients/${caller.id}`} title={`Caller: ${caller.Name || '-'}`}>
+								<TableCell>{caller.Name || '-'}</TableCell>
+								<TableCell>{caller.Phone || '-'}</TableCell>
+								<TableCell>{caller.Date || '-'}</TableCell>
+								<TableCell className="max-w-xs truncate">{caller.Notes || '-'}</TableCell>
+							</TableRow>
+						))
+					) : (
+						<TableRow>
+							<TableCell colSpan={6} className="py-8 text-center text-zinc-500">
+								No caller history found. Check your Airtable connection.
 							</TableCell>
-							<TableCell className="text-right">US{order.amount.usd}</TableCell>
 						</TableRow>
-					))}
+					)}
 				</TableBody>
 			</Table>
-		</>
+		</ClientWrapper>
 	);
 }

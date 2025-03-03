@@ -930,3 +930,52 @@ export function getCountries() {
 		},
 	];
 }
+
+// Define the caller history type based on what we expect from Airtable
+type CallerHistoryItem = {
+	id: string;
+	name?: string;
+	phone_number?: string;
+	call_date?: string;
+	call_duration?: string;
+	call_status?: string;
+	notes?: string;
+	[key: string]: any; // For any additional fields from Airtable
+};
+
+export async function getCallerHistory(): Promise<CallerHistoryItem[]> {
+	try {
+		console.log('Fetching caller history from API endpoint:', new Date().toISOString());
+
+		// Add a cache-busting parameter to ensure we always get fresh data
+		const cacheBuster = `cacheBust=${Date.now()}`;
+		const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000';
+		const url = `${baseUrl}/api/airtable/get-caller-history?${cacheBuster}`;
+
+		const response = await fetch(url, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			// Force Next.js to refetch every time
+			cache: 'no-store',
+			// Also disable caching
+			next: { revalidate: 0 },
+		});
+
+		console.log('API response status:', response.status);
+
+		if (!response.ok) {
+			const errorData = await response.json().catch(() => null);
+			console.error('API error details:', errorData);
+			throw new Error(`Failed to fetch caller history: ${response.status} ${response.statusText}`);
+		}
+
+		const data = await response.json();
+		console.log('Received caller history data:', { success: data.success, count: data.data?.length || 0 });
+		return data.success ? data.data : [];
+	} catch (error) {
+		console.error('Error fetching caller history:', error);
+		return [];
+	}
+}

@@ -37,7 +37,7 @@ export function middleware(request: NextRequest) {
 	return NextResponse.next();
 }
 
-// Configure the middleware to run on all routes
+// Configure the middleware to run on all routes except API routes
 export const config = {
-	matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+	matcher: ['/((?!_next/static|_next/image|favicon.ico|api/).*)'],
 };
