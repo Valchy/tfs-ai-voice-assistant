@@ -1,50 +1,50 @@
 import { Heading } from '@/components/heading';
+import { PageWrapper } from '@/components/page-wrapper';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/table';
-import { getCallerHistory } from '@/data';
+import { getClients } from '@/data';
 import type { Metadata } from 'next';
-import { ClientWrapper } from './client-wrapper';
 
 export const metadata: Metadata = {
 	title: 'Clients',
 };
 
 export default async function ClientsPage() {
-	const callerHistory = await getCallerHistory();
+	const clients = await getClients();
 
-	console.log(`Rendering client page with ${callerHistory.length} history records`);
+	console.log(`Rendering client page with ${clients.length} client records`);
 
 	return (
-		<ClientWrapper>
-			<Heading>Clients</Heading>
-
+		<PageWrapper title={<Heading>Clients</Heading>}>
 			<Table className="mt-8 [--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
 				<TableHead>
 					<TableRow>
 						<TableHeader>Name</TableHeader>
 						<TableHeader>Phone Number</TableHeader>
-						<TableHeader>Call Date</TableHeader>
+						<TableHeader>Passport Number</TableHeader>
+						<TableHeader>Card Status</TableHeader>
 						<TableHeader>Notes</TableHeader>
 					</TableRow>
 				</TableHead>
 				<TableBody>
-					{callerHistory.length > 0 ? (
-						callerHistory.map(caller => (
-							<TableRow key={caller.id} href={`/clients/${caller.id}`} title={`Caller: ${caller.Name || '-'}`}>
-								<TableCell>{caller.Name || '-'}</TableCell>
-								<TableCell>{caller.Phone || '-'}</TableCell>
-								<TableCell>{caller.Date || '-'}</TableCell>
-								<TableCell className="max-w-xs truncate">{caller.Notes || '-'}</TableCell>
+					{clients.length > 0 ? (
+						clients.map(client => (
+							<TableRow key={client.id} href={`/clients/${client.id}`} title={`Client: ${client.Name || '-'}`}>
+								<TableCell>{client.Name || '-'}</TableCell>
+								<TableCell>{client.Phone || '-'}</TableCell>
+								<TableCell>{client.PassportNumber || '-'}</TableCell>
+								<TableCell>{client.CardStatus?.join(', ') || '-'}</TableCell>
+								<TableCell className="max-w-xs truncate">{client.Notes || '-'}</TableCell>
 							</TableRow>
 						))
 					) : (
 						<TableRow>
-							<TableCell colSpan={6} className="py-8 text-center text-zinc-500">
-								No caller history found. Check your Airtable connection.
+							<TableCell colSpan={5} className="py-8 text-center text-zinc-500">
+								No clients found. Check your Airtable connection.
 							</TableCell>
 						</TableRow>
 					)}
 				</TableBody>
 			</Table>
-		</ClientWrapper>
+		</PageWrapper>
 	);
 }

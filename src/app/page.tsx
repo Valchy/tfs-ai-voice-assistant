@@ -1,16 +1,15 @@
 import { Stat } from '@/app/stat';
-import { Avatar } from '@/components/avatar';
 import { Heading, Subheading } from '@/components/heading';
+import { PageWrapper } from '@/components/page-wrapper';
 import { Select } from '@/components/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/table';
-import { getRecentOrders } from '@/data';
+import { getCallerHistory } from '@/data';
 
 export default async function Home() {
-	let orders = await getRecentOrders();
+	let callerHistory = await getCallerHistory();
 
 	return (
-		<>
-			<Heading>Good afternoon, Valeri</Heading>
+		<PageWrapper title={<Heading>Good afternoon, Valeri</Heading>}>
 			<div className="mt-8 flex items-end justify-between">
 				<Subheading>Overview</Subheading>
 				<div>
@@ -22,40 +21,43 @@ export default async function Home() {
 					</Select>
 				</div>
 			</div>
+
 			<div className="mt-4 grid gap-8 sm:grid-cols-2 xl:grid-cols-4">
-				<Stat title="Total revenue" value="$2.6M" change="+4.5%" />
-				<Stat title="Average order value" value="$455" change="-0.5%" />
-				<Stat title="Tickets sold" value="5,888" change="+4.5%" />
-				<Stat title="Pageviews" value="823,067" change="+21.2%" />
+				<Stat title="Total calls" value={callerHistory.length.toString()} change="+4.5%" />
+				<Stat title="Average call duration" value="3m 24s" change="+2.1%" />
+				<Stat title="Call completion rate" value="94%" change="+1.5%" />
+				<Stat title="Customer satisfaction" value="4.7/5" change="+0.3%" />
 			</div>
-			<Subheading className="mt-14">Recent orders</Subheading>
+
+			<Subheading className="mt-14">Recent calls</Subheading>
 			<Table className="mt-4 [--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
 				<TableHead>
 					<TableRow>
-						<TableHeader>Order number</TableHeader>
-						<TableHeader>Purchase date</TableHeader>
-						<TableHeader>Customer</TableHeader>
-						<TableHeader>Event</TableHeader>
-						<TableHeader className="text-right">Amount</TableHeader>
+						<TableHeader>Name</TableHeader>
+						<TableHeader>Phone Number</TableHeader>
+						<TableHeader>Call Date</TableHeader>
+						<TableHeader>Notes</TableHeader>
 					</TableRow>
 				</TableHead>
 				<TableBody>
-					{orders.map(order => (
-						<TableRow key={order.id} href={order.url} title={`Order #${order.id}`}>
-							<TableCell>{order.id}</TableCell>
-							<TableCell className="text-zinc-500">{order.date}</TableCell>
-							<TableCell>{order.customer.name}</TableCell>
-							<TableCell>
-								<div className="flex items-center gap-2">
-									<Avatar src={order.event.thumbUrl} className="size-6" />
-									<span>{order.event.name}</span>
-								</div>
+					{callerHistory.length > 0 ? (
+						callerHistory.map(caller => (
+							<TableRow key={caller.id} href={`/clients/${caller.id}`} title={`Caller: ${caller.Name || '-'}`}>
+								<TableCell>{caller.Name || '-'}</TableCell>
+								<TableCell>{caller.Phone || '-'}</TableCell>
+								<TableCell>{caller.Date || '-'}</TableCell>
+								<TableCell className="max-w-xs truncate">{caller.Notes || '-'}</TableCell>
+							</TableRow>
+						))
+					) : (
+						<TableRow>
+							<TableCell colSpan={4} className="py-8 text-center text-zinc-500">
+								No caller history found. Check your Airtable connection.
 							</TableCell>
-							<TableCell className="text-right">US{order.amount.usd}</TableCell>
 						</TableRow>
-					))}
+					)}
 				</TableBody>
 			</Table>
-		</>
+		</PageWrapper>
 	);
 }

@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 // Configure Airtable
 const apiKey = process.env.AIRTABLE_API_KEY;
 const baseId = process.env.AIRTABLE_BASE_ID;
-const tableName = 'Call History';
+const tableName = 'Clients';
 
 export async function GET() {
 	try {
