@@ -1,3 +1,6 @@
+// Disable static generation and ensure this page is dynamically rendered
+export const dynamic = 'force-dynamic';
+
 import { Heading } from '@/components/heading';
 import { PageWrapper } from '@/components/page-wrapper';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/table';

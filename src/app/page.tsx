@@ -1,3 +1,6 @@
+// Disable static generation and ensure this page is dynamically rendered
+export const dynamic = 'force-dynamic';
+
 import { Stat } from '@/app/stat';
 import { Heading, Subheading } from '@/components/heading';
 import { PageWrapper } from '@/components/page-wrapper';

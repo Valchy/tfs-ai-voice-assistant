@@ -37,11 +37,18 @@ export async function fetchAirtableRecords(tableName: string, errorMessage: stri
 			};
 		});
 
-		// Return the records
-		return NextResponse.json({
-			success: true,
-			data: data,
-		});
+		// Return the records with cache control headers
+		return NextResponse.json(
+			{
+				success: true,
+				data: data,
+			},
+			{
+				headers: {
+					'Cache-Control': 'no-store, max-age=0, must-revalidate',
+				},
+			},
+		);
 	} catch (error) {
 		console.error(`Error fetching data from Airtable table ${tableName}:`, error);
 		return NextResponse.json(
@@ -49,7 +56,12 @@ export async function fetchAirtableRecords(tableName: string, errorMessage: stri
 				success: false,
 				error: errorMessage,
 			},
-			{ status: 500 },
+			{
+				status: 500,
+				headers: {
+					'Cache-Control': 'no-store, max-age=0, must-revalidate',
+				},
+			},
 		);
 	}
 }

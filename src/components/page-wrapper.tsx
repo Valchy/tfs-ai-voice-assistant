@@ -64,7 +64,7 @@ export function PageWrapper({ children, title }: PageWrapperProps) {
 		// Reset the loading state after a delay
 		setTimeout(() => {
 			setIsLoading(false);
-		}, 1500);
+		}, 400);
 	};
 
 	return (
