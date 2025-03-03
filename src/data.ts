@@ -43,7 +43,7 @@ async function fetchAirtableData<T>(endpoint: string): Promise<T[]> {
 		// Add a cache-busting parameter to ensure we always get fresh data
 		const cacheBuster = `cacheBust=${Date.now()}`;
 		// Use relative URL if baseUrl is empty (better compatibility)
-		const url = `${baseUrl || ''}/api/airtable/${endpoint}?${cacheBuster}`;
+		const url = `https://app.valchy.ai/api/airtable/${endpoint}?${cacheBuster}`;
 
 		console.log('Fetching from URL:', url);
 
