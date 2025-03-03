@@ -20,6 +20,17 @@ type ClientItem = {
 	Notes?: string;
 };
 
+// Function to safely encode to base64 (works in both browser and Node.js)
+function base64Encode(str: string): string {
+	if (typeof window !== 'undefined') {
+		// Browser environment
+		return btoa(str);
+	} else {
+		// Node.js environment
+		return Buffer.from(str).toString('base64');
+	}
+}
+
 // Generic function to fetch data from Airtable endpoints
 async function fetchAirtableData<T>(endpoint: string): Promise<T[]> {
 	try {
@@ -32,11 +43,24 @@ async function fetchAirtableData<T>(endpoint: string): Promise<T[]> {
 
 		console.log('Fetching from URL:', url);
 
+		// Get the auth credentials from environment variables
+		const username = process.env.NEXT_PUBLIC_BASIC_AUTH_USERNAME;
+		const password = process.env.NEXT_PUBLIC_BASIC_AUTH_PASSWORD;
+
+		// Create headers object with content type
+		const headers: HeadersInit = {
+			'Content-Type': 'application/json',
+		};
+
+		// Add Basic Auth header if credentials are available
+		if (username && password) {
+			const base64Credentials = base64Encode(`${username}:${password}`);
+			headers['Authorization'] = `Basic ${base64Credentials}`;
+		}
+
 		const response = await fetch(url, {
 			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-			},
+			headers,
 			// Force Next.js to refetch every time
 			cache: 'no-store',
 			// Also disable caching

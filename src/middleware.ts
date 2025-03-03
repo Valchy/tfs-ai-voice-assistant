@@ -7,8 +7,8 @@ export function middleware(request: NextRequest) {
 	const authHeader = request.headers.get('Authorization');
 
 	// Get auth credentials from environment variables
-	const expectedUsername = process.env.BASIC_AUTH_USERNAME || '';
-	const expectedPassword = process.env.BASIC_AUTH_PASSWORD || '';
+	const expectedUsername = process.env.NEXT_PUBLIC_BASIC_AUTH_USERNAME || '';
+	const expectedPassword = process.env.NEXT_PUBLIC_BASIC_AUTH_PASSWORD || '';
 
 	// Only check auth if credentials are set (to prevent locking ourselves out)
 	if (expectedUsername && expectedPassword) {
