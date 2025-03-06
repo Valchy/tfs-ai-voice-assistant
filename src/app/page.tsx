@@ -3,13 +3,13 @@
 // Disable static generation and ensure this page is dynamically rendered
 export const dynamic = 'force-dynamic';
 
-import { Stat } from '@/app/stat';
 import { Badge } from '@/components/badge';
 import { Heading, Subheading } from '@/components/heading';
 import { PageWrapper } from '@/components/page-wrapper';
 import { DataItem, SearchableTable } from '@/components/searchable-table';
 import { Select } from '@/components/select';
 import { StatsSkeleton, TableSkeleton } from '@/components/skeleton';
+import { Stat } from '@/components/stat';
 import { getCallerHistory } from '@/data';
 import { Suspense } from 'react';
 
@@ -54,8 +54,8 @@ function CallerHistoryTable({ callerHistory }: { callerHistory: Caller[] }) {
 		<>
 			<div className="mt-4 grid gap-8 sm:grid-cols-2 xl:grid-cols-4">
 				<Stat title="Total calls" value={callerHistory.length.toString()} change="+4.5%" />
-				<Stat title="Average call duration" value="3m 24s" change="+2.1%" />
-				<Stat title="Call completion rate" value="94%" change="+1.5%" />
+				<Stat title="Average call duration" value="1m 34s" change="+2.1%" />
+				<Stat title="Call completion rate" value="98%" change="+1.5%" />
 				<Stat title="Customer satisfaction" value="4.7/5" change="+0.3%" />
 			</div>
 

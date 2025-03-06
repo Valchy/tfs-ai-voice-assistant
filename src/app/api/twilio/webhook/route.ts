@@ -1,5 +1,6 @@
+import { createApiHandler, createErrorResponse, createSuccessResponse, handleApiError } from '@/lib/api-utils';
 import { getBaseUrl } from '@/lib/utils';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 
 // Basic auth credentials from environment variables
 const AUTH_USERNAME = process.env.NEXT_PUBLIC_BASIC_AUTH_USERNAME;
@@ -15,7 +16,8 @@ function validateCredentials(username: string | null, password: string | null): 
 	return username === AUTH_USERNAME && password === AUTH_PASSWORD;
 }
 
-export async function POST(request: NextRequest) {
+// Handler function for Twilio webhook POST requests
+async function webhookHandler(request: NextRequest) {
 	try {
 		// Extract query parameters for authentication
 		const url = new URL(request.url);
@@ -33,13 +35,7 @@ export async function POST(request: NextRequest) {
 
 		// Validate authentication
 		if (!validateCredentials(username, password)) {
-			return NextResponse.json(
-				{
-					success: false,
-					error: 'Unauthorized: Invalid credentials',
-				},
-				{ status: 401 },
-			);
+			return createErrorResponse('Unauthorized: Invalid credentials', 401);
 		}
 
 		// Extract required fields from the body
@@ -48,23 +44,11 @@ export async function POST(request: NextRequest) {
 
 		// Validate required parameters
 		if (!messageBody) {
-			return NextResponse.json(
-				{
-					success: false,
-					error: 'Missing required parameter: Body',
-				},
-				{ status: 400 },
-			);
+			return createErrorResponse('Missing required parameter: Body', 400);
 		}
 
 		if (!from) {
-			return NextResponse.json(
-				{
-					success: false,
-					error: 'Missing required parameter: From',
-				},
-				{ status: 400 },
-			);
+			return createErrorResponse('Missing required parameter: From', 400);
 		}
 
 		// 1. Get the NEXT_FIELD_UPDATE value from Airtable using the From number
@@ -84,13 +68,7 @@ export async function POST(request: NextRequest) {
 		const fieldToUpdate = airtableGetData.data;
 
 		if (!fieldToUpdate) {
-			return NextResponse.json(
-				{
-					success: false,
-					error: 'No NEXT_FIELD_UPDATE value found for client',
-				},
-				{ status: 404 },
-			);
+			return createErrorResponse('No NEXT_FIELD_UPDATE value found for client', 404);
 		}
 
 		// 2. Update the specified field with the SMS text (Body)
@@ -110,25 +88,20 @@ export async function POST(request: NextRequest) {
 		const updateData = await updateResponse.json();
 
 		// 3. Return success response with updated data
-		return NextResponse.json(
-			{
-				success: true,
-				message: `Successfully processed SMS and updated ${fieldToUpdate} field`,
-				smsText: messageBody,
-				updatedData: updateData.data,
-				body: bodyData,
-			},
-			{ status: 200 },
-		);
+		return createSuccessResponse({
+			message: `Successfully processed SMS and updated ${fieldToUpdate} field`,
+			smsText: messageBody,
+			updatedData: updateData.data,
+			body: bodyData,
+		});
 	} catch (error: any) {
 		console.error('Error processing webhook:', error);
-
-		return NextResponse.json(
-			{
-				success: false,
-				error: error.message || 'Failed to process webhook',
-			},
-			{ status: 500 },
-		);
+		return handleApiError(error);
 	}
 }
+
+// Apply rate limiting to the webhook handler
+// Using 'low' tier for the webhook since it could receive more frequent calls
+export const POST = createApiHandler(webhookHandler, {
+	rateLimitTier: 'low',
+});

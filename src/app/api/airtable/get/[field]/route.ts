@@ -1,5 +1,6 @@
+import { createApiHandler, createErrorResponse, createSuccessResponse, handleApiError } from '@/lib/api-utils';
 import Airtable from 'airtable';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 
 // Get Airtable credentials from environment variables
 const apiKey = process.env.AIRTABLE_API_KEY;
@@ -11,18 +12,12 @@ type ClientRecord = {
 	[key: string]: any;
 };
 
-// GET method to retrieve a client by phone number
-export async function GET(request: NextRequest, { params }: { params: { field: string } }) {
+// Handler function for the GET request
+async function getFieldHandler(request: NextRequest, { params }: { params: { field: string } }) {
 	try {
 		// Validate Airtable environment variables
 		if (!apiKey || !baseId) {
-			return NextResponse.json(
-				{
-					success: false,
-					error: 'Airtable environment variables are not properly configured',
-				},
-				{ status: 500 },
-			);
+			return createErrorResponse('Airtable environment variables are not properly configured', 500);
 		}
 
 		// Get phone number from URL parameter
@@ -32,13 +27,7 @@ export async function GET(request: NextRequest, { params }: { params: { field: s
 
 		// Validate phone number parameter
 		if (!phoneNumber) {
-			return NextResponse.json(
-				{
-					success: false,
-					error: 'Missing required parameter: "phone" is required',
-				},
-				{ status: 400 },
-			);
+			return createErrorResponse('Missing required parameter: "phone" is required', 400);
 		}
 
 		// Initialize Airtable
@@ -54,13 +43,7 @@ export async function GET(request: NextRequest, { params }: { params: { field: s
 
 		// Check if a client was found
 		if (records.length === 0) {
-			return NextResponse.json(
-				{
-					success: false,
-					error: 'No client found with the provided phone number',
-				},
-				{ status: 404 },
-			);
+			return createErrorResponse('No client found with the provided phone number', 404);
 		}
 
 		// Transform the client record to a more friendly format
@@ -71,40 +54,19 @@ export async function GET(request: NextRequest, { params }: { params: { field: s
 
 		// If a specific field was requested, return only that field
 		if (fieldParam && fieldParam in client) {
-			return NextResponse.json(
-				{
-					success: true,
-					data: client[fieldParam],
-				},
-				{
-					headers: {
-						'Cache-Control': 'no-store, max-age=0, must-revalidate',
-					},
-				},
-			);
+			return createSuccessResponse(client[fieldParam]);
 		}
 
-		// Return the client with cache control headers
-		return NextResponse.json(
-			{
-				success: true,
-				data: client,
-			},
-			{
-				headers: {
-					'Cache-Control': 'no-store, max-age=0, must-revalidate',
-				},
-			},
-		);
+		// Return the full client data
+		return createSuccessResponse(client);
 	} catch (error: any) {
 		console.error('Error retrieving client:', error);
-
-		return NextResponse.json(
-			{
-				success: false,
-				error: error.message || 'Failed to retrieve client',
-			},
-			{ status: 500 },
-		);
+		return handleApiError(error);
 	}
 }
+
+// Export the handler with rate limiting applied
+// Using the 'low' tier since this is a read operation
+export const GET = createApiHandler(getFieldHandler, {
+	rateLimitTier: 'low',
+});

@@ -3,7 +3,7 @@
 import { Input } from '@/components/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/table';
 import Fuse from 'fuse.js';
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 
 // Generic type for data items with id
 export type DataItem = {
@@ -38,23 +38,52 @@ export function SearchableTable<T extends DataItem>({
 	maxHeight = '70vh',
 }: SearchableTableProps<T>) {
 	const [searchQuery, setSearchQuery] = useState('');
-	const [filteredItems, setFilteredItems] = useState<T[]>(data);
+	const [filteredItems, setFilteredItems] = useState<T[]>([]);
 
-	// Update filtered items when search query or data changes
+	// Keep track of previous data reference to avoid unnecessary updates
+	const dataRef = useRef<T[]>(data);
+
+	// Create a stable version of the data prop to avoid unnecessary re-renders
+	const stableData = useMemo(() => {
+		// Only update if the data reference has changed and content is different
+		if (dataRef.current !== data) {
+			// Check if array length changed or if any items have changed
+			const hasChanged = dataRef.current.length !== data.length || JSON.stringify(dataRef.current) !== JSON.stringify(data);
+
+			if (hasChanged) {
+				dataRef.current = data;
+				console.log('Data reference updated in SearchableTable');
+			}
+		}
+		return dataRef.current;
+	}, [data]);
+
+	// Create a memoized Fuse instance that only updates when stableData or searchKeys change
+	const fuse = useMemo(() => {
+		console.log('Creating new Fuse instance');
+		return new Fuse(stableData, {
+			keys: searchKeys,
+			threshold: 0.3,
+			includeScore: true,
+		});
+	}, [stableData, searchKeys]);
+
+	// Update filtered items only when search query or fuse instance changes
 	useEffect(() => {
+		console.log('Filtering SearchableTable items with query:', searchQuery);
 		if (searchQuery.trim() === '') {
-			setFilteredItems(data);
+			setFilteredItems(stableData);
 		} else {
-			// Configure Fuse.js for fuzzy search inside the effect
-			const fuse = new Fuse(data, {
-				keys: searchKeys,
-				threshold: 0.3,
-				includeScore: true,
-			});
 			const results = fuse.search(searchQuery);
 			setFilteredItems(results.map(result => result.item));
 		}
-	}, [searchQuery, data, searchKeys]);
+	}, [searchQuery, fuse, stableData]);
+
+	// Set initial filtered items when component mounts or stableData changes
+	useEffect(() => {
+		console.log('Setting initial filtered items in SearchableTable');
+		setFilteredItems(stableData);
+	}, [stableData]);
 
 	return (
 		<div className={`relative ${className}`}>
@@ -85,7 +114,7 @@ export function SearchableTable<T extends DataItem>({
 						) : (
 							<TableRow>
 								<TableCell colSpan={columns.length} className="py-8 text-center text-zinc-500">
-									{data.length === 0 ? emptyMessage : noResultsMessage}
+									{stableData.length === 0 ? emptyMessage : noResultsMessage}
 								</TableCell>
 							</TableRow>
 						)}

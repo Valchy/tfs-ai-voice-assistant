@@ -1,5 +1,6 @@
+import { createApiHandler, createErrorResponse, createSuccessResponse, handleApiError } from '@/lib/api-utils';
 import Airtable from 'airtable';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 
 // Get Airtable credentials from environment variables
 const apiKey = process.env.AIRTABLE_API_KEY;
@@ -11,52 +12,36 @@ type ClientRecord = {
 	[key: string]: any;
 };
 
-export async function POST(request: NextRequest, { params }: { params: { field: string } }) {
+// Handler function for the POST request
+async function updateFieldHandler(request: NextRequest, { params }: { params: { field: string } }) {
 	try {
 		// Get the field from route parameters
 		const { field } = params;
 
 		// Validate Airtable environment variables
 		if (!apiKey || !baseId) {
-			return NextResponse.json(
-				{
-					success: false,
-					error: 'Airtable environment variables are not properly configured',
-				},
-				{ status: 500 },
-			);
+			return createErrorResponse('Airtable environment variables are not properly configured', 500);
 		}
 
 		// Get parameters from URL query instead of body
 		const url = new URL(request.url);
 		const phone = url.searchParams.get('phone');
 		const value = url.searchParams.get('value');
+		const nextField = url.searchParams.get('next_field'); // Optional
 
 		// Validate required parameters
 		if (!phone) {
-			return NextResponse.json(
-				{
-					success: false,
-					error: 'Missing required parameter: "phone" is required to identify the client',
-				},
-				{ status: 400 },
-			);
+			return createErrorResponse('Missing required parameter: "phone" is required', 400);
 		}
 
-		if (value === null) {
-			return NextResponse.json(
-				{
-					success: false,
-					error: 'Missing required parameter: "value" is required for the update',
-				},
-				{ status: 400 },
-			);
+		if (!value) {
+			return createErrorResponse('Missing required parameter: "value" is required', 400);
 		}
 
 		// Initialize Airtable
 		const base = new Airtable({ apiKey }).base(baseId);
 
-		// Find the client record with the matching phone number
+		// Find the client with the given phone number
 		const records = await base('Clients')
 			.select({
 				filterByFormula: `{Phone} = "${phone}"`,
@@ -66,66 +51,48 @@ export async function POST(request: NextRequest, { params }: { params: { field: 
 
 		// Check if a client was found
 		if (records.length === 0) {
-			return NextResponse.json(
-				{
-					success: false,
-					error: 'No client found with the provided phone number',
-				},
-				{ status: 404 },
-			);
+			return createErrorResponse('No client found with the provided phone number', 404);
 		}
 
-		// Get the record ID
-		const recordId = records[0].id;
+		// Get the client record
+		const clientRecord = records[0];
+		const clientData: ClientRecord = {
+			id: clientRecord.id,
+			...clientRecord.fields,
+		};
 
-		// Update the record with the new field value
-		try {
-			const updatedRecord = await base('Clients').update([
-				{
-					id: recordId,
-					fields: {
-						[field]: value,
-					},
-				},
-			]);
+		// Create the update object with the field to update
+		const updateFields: Record<string, any> = {
+			[field]: value,
+		};
 
-			// Transform the updated record to a more friendly format
-			const client: ClientRecord = {
-				id: updatedRecord[0].id,
-				...updatedRecord[0].fields,
-			};
-
-			// Return the updated client data
-			return NextResponse.json(
-				{
-					success: true,
-					data: client,
-				},
-				{
-					headers: {
-						'Cache-Control': 'no-store, max-age=0, must-revalidate',
-					},
-				},
-			);
-		} catch (updateError: any) {
-			console.error('Error updating Airtable record:', updateError);
-			return NextResponse.json(
-				{
-					success: false,
-					error: updateError.message || 'Failed to update client record',
-				},
-				{ status: 500 },
-			);
+		// Update the NEXT_FIELD_UPDATE field if nextField is provided
+		if (nextField) {
+			updateFields.NEXT_FIELD_UPDATE = nextField;
 		}
-	} catch (error: any) {
-		console.error('Error updating client:', error);
 
-		return NextResponse.json(
-			{
-				success: false,
-				error: error.message || 'Failed to update client',
+		// Update the client record in Airtable
+		const updatedRecord = await base('Clients').update(clientData.id, updateFields);
+
+		// Return success response with updated client data
+		return createSuccessResponse({
+			message: `Successfully updated ${field} field`,
+			updated: {
+				id: updatedRecord.id,
+				...updatedRecord.fields,
 			},
-			{ status: 500 },
-		);
+			originalValue: clientData[field],
+			newValue: value,
+			nextField: nextField || clientData.NEXT_FIELD_UPDATE,
+		});
+	} catch (error: any) {
+		console.error(`Error updating ${params.field} field:`, error);
+		return handleApiError(error);
 	}
 }
+
+// Apply rate limiting to the POST handler
+// Using 'high' tier as this is an update operation
+export const POST = createApiHandler(updateFieldHandler, {
+	rateLimitTier: 'high',
+});
