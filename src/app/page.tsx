@@ -1,9 +1,12 @@
+'use client';
+
 // Disable static generation and ensure this page is dynamically rendered
 export const dynamic = 'force-dynamic';
 
 import { Stat } from '@/app/stat';
 import { Badge } from '@/components/badge';
 import { Heading, Subheading } from '@/components/heading';
+import { NotesButton } from '@/components/notes-button';
 import { PageWrapper } from '@/components/page-wrapper';
 import { Select } from '@/components/select';
 import { StatsSkeleton, TableSkeleton } from '@/components/skeleton';
@@ -11,33 +14,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { getCallerHistory } from '@/data';
 import { Suspense } from 'react';
 
-// Define allowed badge colors
-type BadgeColor =
-	| 'red'
-	| 'orange'
-	| 'amber'
-	| 'yellow'
-	| 'lime'
-	| 'green'
-	| 'emerald'
-	| 'teal'
-	| 'cyan'
-	| 'sky'
-	| 'blue'
-	| 'indigo'
-	| 'violet'
-	| 'purple'
-	| 'fuchsia'
-	| 'pink'
-	| 'rose'
-	| 'zinc';
-
 // Separate data-fetching component
 async function CallerHistoryContent() {
 	const callerHistory = await getCallerHistory();
 
 	// Map for Call Type styles
-	const callTypeStyles: Record<string, { color: BadgeColor }> = {
+	const callTypeStyles: Record<string, { color: 'zinc' | 'indigo' | 'amber' | 'red' | 'sky' | 'green' }> = {
 		'No Action': { color: 'zinc' },
 		'Question Asked': { color: 'indigo' },
 		'Fraud Alert': { color: 'amber' },
@@ -63,7 +45,7 @@ async function CallerHistoryContent() {
 						<TableHeader>Phone</TableHeader>
 						<TableHeader>Date</TableHeader>
 						<TableHeader>Call Type</TableHeader>
-						<TableHeader>Notes</TableHeader>
+						<TableHeader>Summary</TableHeader>
 					</TableRow>
 				</TableHead>
 				<TableBody>
@@ -78,7 +60,9 @@ async function CallerHistoryContent() {
 										{caller['Call Type'] || '-'}
 									</Badge>
 								</TableCell>
-								<TableCell className="max-w-full truncate">{caller.Notes || '-'}</TableCell>
+								<TableCell>
+									<NotesButton notes={caller.Summary || ''} />
+								</TableCell>
 							</TableRow>
 						))
 					) : (

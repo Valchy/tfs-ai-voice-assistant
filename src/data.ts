@@ -7,7 +7,7 @@ type CallerHistoryItem = {
 	Name: string;
 	Date: string;
 	'Call Type': string;
-	Notes?: string;
+	Summary?: string;
 };
 
 // Define the client item type based on what we expect from Airtable
@@ -16,7 +16,7 @@ type ClientItem = {
 	Name: string;
 	Email: string;
 	Phone: string;
-	'Passport Number': string;
+	Passport: string;
 	Birthday: string;
 	'Card Number': string;
 	Address: string;

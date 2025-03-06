@@ -3,12 +3,12 @@ export const dynamic = 'force-dynamic';
 
 import { Heading } from '@/components/heading';
 import { PageWrapper } from '@/components/page-wrapper';
+import { PhoneButton } from '@/components/phone-button';
 import { TableSkeleton } from '@/components/skeleton';
+import { SmsButton } from '@/components/sms-button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/table';
 import { getClients } from '@/data';
 import { Suspense } from 'react';
-import { PhoneButton } from './phone-button';
-import { SmsButton } from './sms-button';
 
 // Separate data-fetching component
 async function ClientsTableContent() {
