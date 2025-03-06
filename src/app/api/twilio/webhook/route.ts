@@ -34,15 +34,15 @@ export async function POST(request: NextRequest) {
 		console.log('Webhook request body:', bodyData);
 
 		// Validate authentication
-		if (!validateCredentials(username, password)) {
-			return NextResponse.json(
-				{
-					success: false,
-					error: 'Unauthorized: Invalid credentials',
-				},
-				{ status: 401 },
-			);
-		}
+		// if (!validateCredentials(username, password)) {
+		// 	return NextResponse.json(
+		// 		{
+		// 			success: false,
+		// 			error: 'Unauthorized: Invalid credentials',
+		// 		},
+		// 		{ status: 401 },
+		// 	);
+		// }
 
 		// Return a simple success response
 		return NextResponse.json(
