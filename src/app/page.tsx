@@ -3,13 +3,13 @@
 // Disable static generation and ensure this page is dynamically rendered
 export const dynamic = 'force-dynamic';
 
-import { Stat } from '@/app/stat';
 import { Badge } from '@/components/badge';
 import { Heading, Subheading } from '@/components/heading';
 import { NotesButton } from '@/components/notes-button';
 import { PageWrapper } from '@/components/page-wrapper';
 import { Select } from '@/components/select';
 import { StatsSkeleton, TableSkeleton } from '@/components/skeleton';
+import { Stat } from '@/components/stat';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/table';
 import { getCallerHistory } from '@/data';
 import { Suspense } from 'react';

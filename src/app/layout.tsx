@@ -6,10 +6,13 @@ import { ApplicationLayout } from './application-layout';
 
 export const metadata: Metadata = {
 	title: {
-		template: '%s - Valchy AI',
+		template: 'Valchy AI',
 		default: 'Valchy AI',
 	},
-	description: '',
+	description: 'Valchy AI is a platform for managing your calls and leads.',
+	icons: {
+		icon: '/favicon.png',
+	},
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

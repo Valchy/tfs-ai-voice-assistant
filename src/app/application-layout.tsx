@@ -30,7 +30,7 @@ export function ApplicationLayout({ children }: { children: React.ReactNode }) {
 					<SidebarHeader>
 						<Dropdown>
 							<DropdownButton as={SidebarItem}>
-								<Avatar src="/teams/catalyst.svg" />
+								<Avatar src="icon_valchy_white.png" />
 								<SidebarLabel>Valchy AI</SidebarLabel>
 							</DropdownButton>
 						</Dropdown>
