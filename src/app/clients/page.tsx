@@ -106,20 +106,7 @@ export default function ClientsPage() {
 
 	return (
 		<PageWrapper title={<Heading>Clients</Heading>}>
-			{loading ? (
-				// Updated skeleton to match the exact structure of the ClientsTable columns
-				<TableSkeleton
-					rows={5}
-					cols={5}
-					className="mt-6"
-					headers={['Name', 'Phone Number', 'Email', 'Birthday', 'Action']}
-					colWidths={['w-1/5', 'w-1/5', 'w-1/5', 'w-1/5', 'w-1/5']}
-				/>
-			) : error ? (
-				<div className="mt-6 text-red-500">{error}</div>
-			) : (
-				<ClientsTable clients={clients} />
-			)}
+			{loading ? <TableSkeleton rows={5} cols={5} className="mt-8" /> : error ? <div className="mt-8 text-red-500">{error}</div> : <ClientsTable clients={clients} />}
 		</PageWrapper>
 	);
 }
