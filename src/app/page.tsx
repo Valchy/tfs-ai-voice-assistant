@@ -25,11 +25,12 @@ export type Caller = DataItem & {
 // CallerHistory component with search functionality
 function CallerHistoryTable({ callerHistory }: { callerHistory: Caller[] }) {
 	// Map for Call Type styles
-	const callTypeStyles: Record<string, { color: 'zinc' | 'indigo' | 'amber' | 'sky' | 'green' }> = {
-		'-': { color: 'zinc' },
-		'Questions Asked': { color: 'indigo' },
+	const callTypeStyles: Record<string, { color: 'zinc' | 'indigo' | 'amber' | 'sky' | 'green' | 'red' }> = {
+		'No Action': { color: 'zinc' },
+		'Question Asked': { color: 'indigo' },
 		'Fraud Alert': { color: 'amber' },
-		'Card Action': { color: 'sky' },
+		'Card Blocked': { color: 'red' },
+		'Card Unblocked': { color: 'sky' },
 		'Card Application': { color: 'green' },
 	};
 

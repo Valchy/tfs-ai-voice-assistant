@@ -6,7 +6,5 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function getBaseUrl(req?: any) {
-	return new URL(
-		req ? req.url : typeof window !== 'undefined' ? window.location.origin : process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://app.valchy.ai',
-	);
+	return new URL(req ? req.url : process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://app.valchy.ai');
 }

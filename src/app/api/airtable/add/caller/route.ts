@@ -103,8 +103,5 @@ async function addCallerHandler(request: NextRequest) {
 	}
 }
 
-// Apply rate limiting to the POST handler
-// Using 'medium' tier as this is a data modification endpoint
-export const POST = createApiHandler(addCallerHandler, {
-	rateLimitTier: 'medium',
-});
+// Handler for POST requests
+export const POST = createApiHandler(addCallerHandler);

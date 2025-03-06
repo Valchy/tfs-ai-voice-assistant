@@ -19,7 +19,5 @@ async function getClientsHandler() {
 	}
 }
 
-// Apply rate limiting to the GET handler with 'low' tier since this is a read-only operation
-export const GET = createApiHandler(getClientsHandler, {
-	rateLimitTier: 'low',
-});
+// Handler for GET requests
+export const GET = createApiHandler(getClientsHandler);

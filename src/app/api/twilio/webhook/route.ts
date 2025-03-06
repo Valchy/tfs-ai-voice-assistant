@@ -102,6 +102,4 @@ async function webhookHandler(request: NextRequest) {
 
 // Apply rate limiting to the webhook handler
 // Using 'low' tier for the webhook since it could receive more frequent calls
-export const POST = createApiHandler(webhookHandler, {
-	rateLimitTier: 'low',
-});
+export const POST = createApiHandler(webhookHandler);

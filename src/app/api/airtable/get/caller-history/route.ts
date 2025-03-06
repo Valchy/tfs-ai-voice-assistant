@@ -26,6 +26,4 @@ async function getCallerHistoryHandler() {
 
 // Apply rate limiting to the GET handler
 // Using 'low' tier as this is a read-only operation
-export const GET = createApiHandler(getCallerHistoryHandler, {
-	rateLimitTier: 'low',
-});
+export const GET = createApiHandler(getCallerHistoryHandler);
