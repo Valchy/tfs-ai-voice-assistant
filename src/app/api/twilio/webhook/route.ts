@@ -33,31 +33,6 @@ export async function POST(request: NextRequest) {
 		// Log the entire request body
 		console.log('Webhook request body:', bodyData);
 
-		// Extract required fields from the body
-		const from = bodyData['From'];
-		const messageBody = bodyData['Body'];
-
-		// Validate required parameters
-		if (!messageBody) {
-			return NextResponse.json(
-				{
-					success: false,
-					error: 'Missing required parameter: Body',
-				},
-				{ status: 400 },
-			);
-		}
-
-		if (!from) {
-			return NextResponse.json(
-				{
-					success: false,
-					error: 'Missing required parameter: From',
-				},
-				{ status: 400 },
-			);
-		}
-
 		// Validate authentication
 		if (!validateCredentials(username, password)) {
 			return NextResponse.json(
@@ -69,58 +44,12 @@ export async function POST(request: NextRequest) {
 			);
 		}
 
-		// 1. The SMS text is now directly available as messageBody
-		const smsText = messageBody;
-
-		// 2. Get the NEXT_FIELD_UPDATE value from Airtable using the From number
-		const airtableGetResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/airtable/get/NEXT_FIELD_UPDATE?phone=${encodeURIComponent(from)}`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		});
-
-		if (!airtableGetResponse.ok) {
-			throw new Error(`Failed to get Airtable data: ${airtableGetResponse.statusText}`);
-		}
-
-		const airtableGetData = await airtableGetResponse.json();
-		const fieldToUpdate = airtableGetData.data;
-
-		if (!fieldToUpdate) {
-			return NextResponse.json(
-				{
-					success: false,
-					error: 'No NEXT_FIELD_UPDATE value found for client',
-				},
-				{ status: 404 },
-			);
-		}
-
-		// 3. Update the specified field with the SMS text
-		const updateResponse = await fetch(
-			`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/airtable/update/${fieldToUpdate}?phone=${encodeURIComponent(from)}&value=${encodeURIComponent(smsText)}`,
-			{
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			},
-		);
-
-		if (!updateResponse.ok) {
-			throw new Error(`Failed to update Airtable: ${updateResponse.statusText}`);
-		}
-
-		const updateData = await updateResponse.json();
-
-		// 4. Return success response with updated data
+		// Return a simple success response
 		return NextResponse.json(
 			{
 				success: true,
-				message: `Successfully processed SMS and updated ${fieldToUpdate} field`,
-				smsText,
-				updatedData: updateData.data,
+				message: 'Credentials valid',
+				body: bodyData,
 			},
 			{ status: 200 },
 		);
