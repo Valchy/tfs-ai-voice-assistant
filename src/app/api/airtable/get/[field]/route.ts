@@ -65,5 +65,8 @@ async function getFieldHandler(request: NextRequest, { params }: { params: { fie
 	}
 }
 
-// Handler for GET requests
-export const GET = createApiHandler(getFieldHandler);
+// Export the handler with rate limiting applied
+// Using the 'low' tier since this is a read operation
+export const GET = createApiHandler(getFieldHandler, {
+	rateLimitTier: 'low',
+});

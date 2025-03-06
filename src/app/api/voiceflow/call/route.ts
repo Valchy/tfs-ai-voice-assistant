@@ -73,5 +73,8 @@ async function callHandler(request: NextRequest) {
 	}
 }
 
-// Handler for GET requests
-export const GET = createApiHandler(callHandler);
+// Apply rate limiting to the GET handler
+// Using 'medium' tier for this endpoint
+export const GET = createApiHandler(callHandler, {
+	rateLimitTier: 'medium',
+});

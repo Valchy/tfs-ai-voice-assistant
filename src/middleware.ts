@@ -1,8 +1,33 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+import { rateLimit, RateLimitTier } from './lib/rate-limit';
 
 // This function runs for every request to handle authentication and cache control
 export async function middleware(request: NextRequest) {
+	// Apply rate limiting for API routes
+	if (request.nextUrl.pathname.startsWith('/api/')) {
+		// Define rate limit tier based on the endpoint
+		let tier: RateLimitTier = 'medium';
+
+		// Determine the appropriate rate limit tier based on the endpoint type
+		if (request.nextUrl.pathname.startsWith('/api/twilio/webhook') || request.nextUrl.pathname.startsWith('/api/airtable/add/caller')) {
+			// Low rate limiting for webhook endpoints that are called by external services
+			tier = 'low';
+		} else if (request.nextUrl.pathname.includes('/get/')) {
+			// Medium tier for read operations
+			tier = 'medium';
+		} else {
+			// High tier for write operations (more strict)
+			tier = 'high';
+		}
+
+		// Apply rate limiting - if limit exceeded, return the error response
+		const rateLimitResponse = await rateLimit(request, tier);
+		if (rateLimitResponse) {
+			return rateLimitResponse;
+		}
+	}
+
 	// Skip authentication for the Twilio webhook endpoint
 	// as it handles its own authentication via query parameters
 	if (request.nextUrl.pathname.startsWith('/api/twilio/webhook') || request.nextUrl.pathname.startsWith('/api/airtable/add/caller')) {

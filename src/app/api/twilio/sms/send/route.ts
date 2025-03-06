@@ -57,4 +57,6 @@ async function sendSmsHandler(request: NextRequest) {
 
 // Apply rate limiting to the POST handler
 // Using 'high' tier as SMS sending is a sensitive operation
-export const POST = createApiHandler(sendSmsHandler);
+export const POST = createApiHandler(sendSmsHandler, {
+	rateLimitTier: 'high',
+});

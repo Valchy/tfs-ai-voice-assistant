@@ -91,5 +91,8 @@ async function updateFieldHandler(request: NextRequest, { params }: { params: { 
 	}
 }
 
-// Handler for POST requests
-export const POST = createApiHandler(updateFieldHandler);
+// Apply rate limiting to the POST handler
+// Using 'high' tier as this is an update operation
+export const POST = createApiHandler(updateFieldHandler, {
+	rateLimitTier: 'high',
+});

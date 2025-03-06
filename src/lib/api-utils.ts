@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { RateLimitTier, withRateLimit } from './rate-limit';
 
 /**
  * Type for API route handlers that can include route parameters
@@ -6,13 +7,44 @@ import { NextRequest, NextResponse } from 'next/server';
 export type ApiHandler = (req: NextRequest, context?: any) => Promise<NextResponse> | NextResponse;
 
 /**
- * Creates an API route handler
- * Simplified function that directly returns the handler
+ * Options for creating API route handlers
+ */
+export interface ApiHandlerOptions {
+	/**
+	 * Enable rate limiting for this handler
+	 * @default true
+	 */
+	rateLimit?: boolean;
+
+	/**
+	 * Rate limit tier to use (low, medium, high)
+	 * @default 'medium'
+	 */
+	rateLimitTier?: RateLimitTier;
+}
+
+/**
+ * Creates an API route handler with optional rate limiting
  *
  * @param handler The route handler function
- * @returns The same handler function, unchanged
+ * @param options Configuration options
+ * @returns A Next.js API route handler
  */
-export function createApiHandler(handler: ApiHandler): ApiHandler {
+export function createApiHandler(handler: ApiHandler, options: ApiHandlerOptions = {}): ApiHandler {
+	// Default options
+	const { rateLimit = true, rateLimitTier = 'medium' } = options;
+
+	// Apply rate limiting if enabled
+	if (rateLimit) {
+		// We need to preserve the context parameter when wrapping the handler
+		return async (req: NextRequest, context?: any) => {
+			const limiterResponse = await withRateLimit(request => handler(request, context), rateLimitTier)(req);
+
+			return limiterResponse;
+		};
+	}
+
+	// Otherwise return the handler as is
 	return handler;
 }
 
