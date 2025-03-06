@@ -1,5 +1,3 @@
-'use client';
-
 // Disable static generation and ensure this page is dynamically rendered
 export const dynamic = 'force-dynamic';
 
@@ -7,48 +5,45 @@ import { Stat } from '@/app/stat';
 import { Badge } from '@/components/badge';
 import { Heading, Subheading } from '@/components/heading';
 import { PageWrapper } from '@/components/page-wrapper';
-import { DataItem, SearchableTable } from '@/components/searchable-table';
 import { Select } from '@/components/select';
 import { StatsSkeleton, TableSkeleton } from '@/components/skeleton';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/table';
 import { getCallerHistory } from '@/data';
 import { Suspense } from 'react';
 
-// Define caller type
-export type Caller = DataItem & {
-	Name?: string;
-	Phone?: string;
-	Date?: string;
-	'Call Type'?: string;
-	Notes?: string;
-};
+// Define allowed badge colors
+type BadgeColor =
+	| 'red'
+	| 'orange'
+	| 'amber'
+	| 'yellow'
+	| 'lime'
+	| 'green'
+	| 'emerald'
+	| 'teal'
+	| 'cyan'
+	| 'sky'
+	| 'blue'
+	| 'indigo'
+	| 'violet'
+	| 'purple'
+	| 'fuchsia'
+	| 'pink'
+	| 'rose'
+	| 'zinc';
 
-// CallerHistory component with search functionality
-function CallerHistoryTable({ callerHistory }: { callerHistory: Caller[] }) {
+// Separate data-fetching component
+async function CallerHistoryContent() {
+	const callerHistory = await getCallerHistory();
+
 	// Map for Call Type styles
-	const callTypeStyles: Record<string, { color: 'zinc' | 'indigo' | 'amber' | 'sky' | 'green' }> = {
+	const callTypeStyles: Record<string, { color: BadgeColor }> = {
 		'-': { color: 'zinc' },
-		'Questions Asked': { color: 'indigo' },
-		'Fraud Alert': { color: 'amber' },
-		'Card Action': { color: 'sky' },
-		'Card Application': { color: 'green' },
+		'Ask a question': { color: 'indigo' },
+		'Fraud alert': { color: 'amber' },
+		'Block or unblock a card': { color: 'sky' },
+		'Apply for a card': { color: 'green' },
 	};
-
-	// Define columns for the table
-	const columns = [
-		{ key: 'Name', header: 'Name' },
-		{ key: 'Phone', header: 'Phone' },
-		{ key: 'Date', header: 'Date' },
-		{
-			key: 'Call Type',
-			header: 'Call Type',
-			render: (caller: Caller) => (
-				<Badge color={callTypeStyles[caller['Call Type'] || '-']?.color || 'zinc'} className="px-3 py-1">
-					{caller['Call Type'] || '-'}
-				</Badge>
-			),
-		},
-		{ key: 'Notes', header: 'Notes' },
-	];
 
 	return (
 		<>
@@ -59,27 +54,43 @@ function CallerHistoryTable({ callerHistory }: { callerHistory: Caller[] }) {
 				<Stat title="Customer satisfaction" value="4.7/5" change="+0.3%" />
 			</div>
 
-			<div className="mt-14 flex items-center justify-between">
-				<Subheading>Recent calls</Subheading>
-			</div>
-
-			<SearchableTable
-				data={callerHistory}
-				searchKeys={['Name', 'Phone', 'Call Type', 'Notes']}
-				columns={columns}
-				emptyMessage="No caller history found. Check your Airtable connection."
-				noResultsMessage="No matching calls found."
-				searchPlaceholder="Search calls..."
-				className="mt-4"
-			/>
+			<Subheading className="mt-14">Recent calls</Subheading>
+			<Table className="mt-4 [--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
+				<TableHead>
+					<TableRow>
+						<TableHeader>Name</TableHeader>
+						<TableHeader>Phone</TableHeader>
+						<TableHeader>Date</TableHeader>
+						<TableHeader>Call Type</TableHeader>
+						<TableHeader>Notes</TableHeader>
+					</TableRow>
+				</TableHead>
+				<TableBody>
+					{callerHistory.length > 0 ? (
+						callerHistory.map(caller => (
+							<TableRow key={caller.id} title={`Caller: ${caller.Name || '-'}`}>
+								<TableCell>{caller.Name || '-'}</TableCell>
+								<TableCell>{caller.Phone || '-'}</TableCell>
+								<TableCell>{caller.Date || '-'}</TableCell>
+								<TableCell>
+									<Badge color={callTypeStyles[caller['Call Type'] || '-']?.color || 'zinc'} className="px-3 py-1">
+										{caller['Call Type'] || '-'}
+									</Badge>
+								</TableCell>
+								<TableCell className="max-w-full truncate">{caller.Notes || '-'}</TableCell>
+							</TableRow>
+						))
+					) : (
+						<TableRow>
+							<TableCell colSpan={5} className="py-8 text-center text-zinc-500">
+								No caller history found. Check your Airtable connection.
+							</TableCell>
+						</TableRow>
+					)}
+				</TableBody>
+			</Table>
 		</>
 	);
-}
-
-// Separate data-fetching component
-async function CallerHistoryContent() {
-	const callerHistory = await getCallerHistory();
-	return <CallerHistoryTable callerHistory={callerHistory} />;
 }
 
 export default function Home() {
