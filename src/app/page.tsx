@@ -1,5 +1,3 @@
-'use client';
-
 // Disable static generation and ensure this page is dynamically rendered
 export const dynamic = 'force-dynamic';
 
