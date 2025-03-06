@@ -8,6 +8,7 @@ import { TableSkeleton } from '@/components/skeleton';
 import { SmsButton } from '@/components/sms-button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/table';
 import { getClients } from '@/data';
+import { formatPhoneNumber } from '@/lib/utils';
 import { Suspense } from 'react';
 
 // Separate data-fetching component
@@ -31,7 +32,7 @@ async function ClientsTableContent() {
 					clients.map(client => (
 						<TableRow key={client.id} title={`Client: ${client.Name || '-'}`}>
 							<TableCell>{client.Name || '-'}</TableCell>
-							<TableCell>{client.Phone || '-'}</TableCell>
+							<TableCell>{formatPhoneNumber(client.Phone)}</TableCell>
 							<TableCell>{client.Email || '-'}</TableCell>
 							<TableCell>{client.Birthday}</TableCell>
 							<TableCell>

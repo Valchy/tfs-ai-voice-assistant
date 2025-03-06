@@ -12,6 +12,7 @@ import { StatsSkeleton, TableSkeleton } from '@/components/skeleton';
 import { Stat } from '@/components/stat';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/table';
 import { getCallerHistory } from '@/data';
+import { formatPhoneNumber } from '@/lib/utils';
 import { Suspense } from 'react';
 
 // Separate data-fetching component
@@ -53,7 +54,7 @@ async function CallerHistoryContent() {
 						callerHistory.map(caller => (
 							<TableRow key={caller.id} title={`Caller: ${caller.Name || '-'}`}>
 								<TableCell>{caller.Name || '-'}</TableCell>
-								<TableCell>{caller.Phone || '-'}</TableCell>
+								<TableCell>{formatPhoneNumber(caller.Phone)}</TableCell>
 								<TableCell>{caller.Date || '-'}</TableCell>
 								<TableCell>
 									<Badge color={callTypeStyles[caller['Call Type'] || '-']?.color || 'zinc'} className="px-3 py-1">
