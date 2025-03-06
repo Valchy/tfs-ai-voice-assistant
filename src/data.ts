@@ -1,3 +1,5 @@
+import { getBaseUrl } from './lib/utils';
+
 // Define the caller history type based on what we expect from Airtable
 type CallerHistoryItem = {
 	id: string;
@@ -38,8 +40,7 @@ async function fetchAirtableData<T>(endpoint: string): Promise<T[]> {
 
 		// Add a cache-busting parameter to ensure we always get fresh data
 		const cacheBuster = `cacheBust=${Date.now()}`;
-		const baseUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://app.valchy.ai';
-		const url = `${baseUrl}/api/airtable/get/${endpoint}?${cacheBuster}`;
+		const url = `${getBaseUrl()}/api/airtable/get/${endpoint}?${cacheBuster}`;
 
 		console.log('Fetching from URL:', url);
 
@@ -90,8 +91,7 @@ export async function initiateVoiceflowCall(phoneNumber: string): Promise<boolea
 		console.log(`Initiating call to phone number: ${phoneNumber}`);
 
 		// Build the base URL for the call endpoint
-		const baseUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://app.valchy.ai';
-		const url = `${baseUrl}/api/voiceflow/call?phone=${encodeURIComponent(phoneNumber)}`;
+		const url = `${getBaseUrl()}/api/voiceflow/call?phone=${encodeURIComponent(phoneNumber)}`;
 
 		// Get the auth credentials from environment variables
 		const username = process.env.NEXT_PUBLIC_BASIC_AUTH_USERNAME;
@@ -137,8 +137,7 @@ export async function sendSmsMessage(phoneNumber: string, message: string): Prom
 		console.log(`Sending SMS to phone number: ${phoneNumber} with message: ${message}`);
 
 		// Build the base URL for the Twilio SMS endpoint
-		const baseUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://app.valchy.ai';
-		const url = `${baseUrl}/api/twilio/sms/send`;
+		const url = `${getBaseUrl()}/api/twilio/sms/send`;
 
 		// Get the auth credentials from environment variables
 		const username = process.env.NEXT_PUBLIC_BASIC_AUTH_USERNAME;

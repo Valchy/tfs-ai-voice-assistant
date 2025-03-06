@@ -1,3 +1,4 @@
+import { getBaseUrl } from '@/lib/utils';
 import { NextRequest, NextResponse } from 'next/server';
 
 // Basic auth credentials from environment variables
@@ -30,25 +31,91 @@ export async function POST(request: NextRequest) {
 			bodyData[key] = value;
 		});
 
-		// Log the entire request body
-		console.log('Webhook request body:', bodyData);
-
 		// Validate authentication
-		// if (!validateCredentials(username, password)) {
-		// 	return NextResponse.json(
-		// 		{
-		// 			success: false,
-		// 			error: 'Unauthorized: Invalid credentials',
-		// 		},
-		// 		{ status: 401 },
-		// 	);
-		// }
+		if (!validateCredentials(username, password)) {
+			return NextResponse.json(
+				{
+					success: false,
+					error: 'Unauthorized: Invalid credentials',
+				},
+				{ status: 401 },
+			);
+		}
 
-		// Return a simple success response
+		// Extract required fields from the body
+		const from = bodyData['From'];
+		const messageBody = bodyData['Body'];
+
+		// Validate required parameters
+		if (!messageBody) {
+			return NextResponse.json(
+				{
+					success: false,
+					error: 'Missing required parameter: Body',
+				},
+				{ status: 400 },
+			);
+		}
+
+		if (!from) {
+			return NextResponse.json(
+				{
+					success: false,
+					error: 'Missing required parameter: From',
+				},
+				{ status: 400 },
+			);
+		}
+
+		// 1. Get the NEXT_FIELD_UPDATE value from Airtable using the From number
+		const airtableGetResponse = await fetch(`${getBaseUrl()}/api/airtable/get/NEXT_FIELD_UPDATE?phone=${encodeURIComponent(from)}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`,
+			},
+		});
+
+		if (!airtableGetResponse.ok) {
+			throw new Error(`Failed to get Airtable data: ${airtableGetResponse.statusText}`);
+		}
+
+		const airtableGetData = await airtableGetResponse.json();
+		const fieldToUpdate = airtableGetData.data;
+
+		if (!fieldToUpdate) {
+			return NextResponse.json(
+				{
+					success: false,
+					error: 'No NEXT_FIELD_UPDATE value found for client',
+				},
+				{ status: 404 },
+			);
+		}
+
+		// 2. Update the specified field with the SMS text (Body)
+		console.log(from, messageBody);
+		const updateResponse = await fetch(`${getBaseUrl()}/api/airtable/update/${fieldToUpdate}?phone=${encodeURIComponent(from)}&value=${encodeURIComponent(messageBody)}`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`,
+			},
+		});
+
+		if (!updateResponse.ok) {
+			throw new Error(`Failed to update Airtable: ${updateResponse.statusText}`);
+		}
+
+		const updateData = await updateResponse.json();
+
+		// 3. Return success response with updated data
 		return NextResponse.json(
 			{
 				success: true,
-				message: 'Credentials valid',
+				message: `Successfully processed SMS and updated ${fieldToUpdate} field`,
+				smsText: messageBody,
+				updatedData: updateData.data,
 				body: bodyData,
 			},
 			{ status: 200 },
