@@ -3,6 +3,19 @@ import { NextResponse } from 'next/server';
 
 // This function runs for every request to handle authentication and cache control
 export function middleware(request: NextRequest) {
+	// Skip authentication for the Twilio webhook endpoint
+	// as it handles its own authentication via query parameters
+	if (request.nextUrl.pathname.startsWith('/api/twilio/webhook')) {
+		const response = NextResponse.next();
+
+		// Add cache control headers
+		response.headers.set('Cache-Control', 'no-store, max-age=0, must-revalidate');
+		response.headers.set('Pragma', 'no-cache');
+		response.headers.set('Expires', '0');
+
+		return response;
+	}
+
 	// Get the Authorization header from the request
 	const authHeader = request.headers.get('Authorization');
 
