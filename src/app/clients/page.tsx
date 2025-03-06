@@ -8,7 +8,7 @@ import { PageWrapper } from '@/components/page-wrapper';
 import { DataItem, SearchableTable } from '@/components/searchable-table';
 import { TableSkeleton } from '@/components/skeleton';
 import { getClients } from '@/data';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { Suspense } from 'react';
 import { PhoneButton } from './phone-button';
 import { SmsButton } from './sms-button';
 
@@ -21,11 +21,9 @@ export type Client = DataItem & {
 	Notes?: string;
 };
 
-// Memoized client table component to prevent unnecessary re-renders
-const ClientsTable = ({ clients }: { clients: Client[] }) => {
-	console.log(`Rendering ClientsTable with ${clients.length} clients`);
-
-	// Define columns for the table - memoize this if it causes performance issues
+// Client table component with search functionality
+function ClientsTable({ clients }: { clients: Client[] }) {
+	// Define columns for the table
 	const columns = [
 		{ key: 'Name', header: 'Name' },
 		{ key: 'Phone', header: 'Phone Number' },
@@ -54,59 +52,22 @@ const ClientsTable = ({ clients }: { clients: Client[] }) => {
 			className="mt-6"
 		/>
 	);
-};
+}
 
-// Main clients page component
+// Separate data-fetching component
+async function ClientsTableContent() {
+	const clients = await getClients();
+	console.log(`Rendering client page with ${clients.length} client records`);
+
+	return <ClientsTable clients={clients} />;
+}
+
 export default function ClientsPage() {
-	// State to hold clients data
-	const [clients, setClients] = useState<Client[]>([]);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState<string | null>(null);
-
-	// Ref to track if data is being loaded
-	const loadingRef = useRef(false);
-
-	// Memoized fetch function to avoid recreating it on each render
-	const fetchClients = useCallback(async () => {
-		// Prevent concurrent fetches
-		if (loadingRef.current) {
-			console.log('Already loading clients data, skipping fetch');
-			return;
-		}
-
-		try {
-			loadingRef.current = true;
-			console.log('Fetching clients data...');
-
-			const data = await getClients();
-
-			console.log(`Loaded ${data.length} clients`);
-			setClients(data);
-			setLoading(false);
-		} catch (err) {
-			console.error('Error loading clients:', err);
-			setError('Failed to load clients data');
-			setLoading(false);
-		} finally {
-			loadingRef.current = false;
-		}
-	}, []);
-
-	// Fetch data on initial load
-	useEffect(() => {
-		// Skip if we already have data or if we're already loading
-		if (clients.length > 0 || loadingRef.current) {
-			return;
-		}
-
-		fetchClients();
-
-		// No cleanup function needed since we're using loadingRef to prevent concurrent fetches
-	}, [fetchClients, clients.length]);
-
 	return (
 		<PageWrapper title={<Heading>Clients</Heading>}>
-			{loading ? <TableSkeleton rows={5} cols={5} className="mt-8" /> : error ? <div className="mt-8 text-red-500">{error}</div> : <ClientsTable clients={clients} />}
+			<Suspense fallback={<TableSkeleton rows={5} cols={1} className="mt-8" />}>
+				<ClientsTableContent />
+			</Suspense>
 		</PageWrapper>
 	);
 }

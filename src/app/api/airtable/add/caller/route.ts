@@ -1,6 +1,5 @@
-import { createApiHandler, createErrorResponse, createSuccessResponse, handleApiError } from '@/lib/api-utils';
 import Airtable from 'airtable';
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 // Get Airtable credentials from environment variables
 const apiKey = process.env.AIRTABLE_API_KEY;
@@ -22,89 +21,95 @@ function validateCredentials(username: string | null, password: string | null): 
 
 export const dynamic = 'force-dynamic'; // This prevents Edge and Vercel from caching
 
-// Handler function for POST requests
-async function addCallerHandler(request: NextRequest) {
+export async function POST(request: NextRequest) {
 	try {
 		// Extract query parameters for authentication and data
 		const url = new URL(request.url);
 		const username = url.searchParams.get('username');
 		const password = url.searchParams.get('password');
 		const phone = url.searchParams.get('phone');
+		const name = url.searchParams.get('name'); // Optional
 
 		// Validate authentication
 		if (!validateCredentials(username, password)) {
-			return createErrorResponse('Unauthorized: Invalid credentials', 401);
+			return NextResponse.json(
+				{
+					success: false,
+					error: 'Unauthorized: Invalid credentials',
+				},
+				{ status: 401 },
+			);
+		}
+
+		// Validate required parameters
+		if (!phone) {
+			return NextResponse.json(
+				{
+					success: false,
+					error: 'Missing required parameter: "phone" is required',
+				},
+				{ status: 400 },
+			);
 		}
 
 		// Validate Airtable environment variables
 		if (!apiKey || !baseId) {
-			return createErrorResponse('Airtable environment variables are not properly configured', 500);
-		}
-
-		// Validate phone number parameter
-		if (!phone) {
-			return createErrorResponse('Missing required parameter: phone', 400);
+			return NextResponse.json(
+				{
+					success: false,
+					error: 'Airtable environment variables are not properly configured',
+				},
+				{ status: 500 },
+			);
 		}
 
 		// Initialize Airtable
 		const base = new Airtable({ apiKey }).base(baseId);
 
-		// Check if client already exists with this phone number
-		const existingRecords = await base('Clients')
-			.select({
-				filterByFormula: `{Phone} = "${phone}"`,
-				maxRecords: 1,
-			})
-			.all();
+		// Create fields object with required and optional fields
+		const fields: Record<string, any> = {
+			Phone: phone,
+		};
 
-		// If a client with this phone number already exists, return error or existing client data
-		if (existingRecords.length > 0) {
-			return createSuccessResponse(
-				{
-					message: 'Client with this phone number already exists',
-					client: {
-						id: existingRecords[0].id,
-						...existingRecords[0].fields,
-					},
-				},
-				200,
-			);
+		// Add name if provided
+		if (name) {
+			fields.Name = name;
 		}
 
-		// Add new client to Airtable
-		const createdRecords = await base('Clients').create([
+		// Create the record in the Call History table
+		const createdRecords = await base('Call History').create([
 			{
-				fields: {
-					Phone: phone,
-					Status: 'New',
-					NEXT_FIELD_UPDATE: 'FirstName', // Set the next field to be updated via SMS
-				},
+				fields,
 			},
 		]);
 
-		// Return success response with created client data
-		if (createdRecords && createdRecords.length > 0) {
-			return createSuccessResponse(
-				{
-					message: 'Successfully added new caller',
-					client: {
-						id: createdRecords[0].id,
-						...createdRecords[0].fields,
-					},
+		// Transform the created record to a more friendly format
+		const recordData = {
+			id: createdRecords[0].id,
+			...createdRecords[0].fields,
+		};
+
+		// Return success response with the created record
+		return NextResponse.json(
+			{
+				success: true,
+				data: recordData,
+			},
+			{
+				headers: {
+					'Cache-Control': 'no-store, max-age=0, must-revalidate',
 				},
-				201,
-			);
-		} else {
-			throw new Error('Failed to create client record');
-		}
+			},
+		);
 	} catch (error: any) {
-		console.error('Error adding caller:', error);
-		return handleApiError(error);
+		console.error('Error adding caller to Call History:', error);
+
+		return NextResponse.json(
+			{
+				success: false,
+				error: error.message || 'Failed to add caller to Call History',
+			},
+			{ status: 500 },
+		);
 	}
 }
-
-// Apply rate limiting to the POST handler
-// Using 'medium' tier as this is a data modification endpoint
-export const POST = createApiHandler(addCallerHandler, {
-	rateLimitTier: 'medium',
-});
