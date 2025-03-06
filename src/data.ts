@@ -23,6 +23,15 @@ type ClientItem = {
 	'Card Status': string[];
 };
 
+// Define the card item type based on what we expect from Airtable
+export type CardItem = {
+	id: string;
+	'Card Number': string;
+	Phone: string;
+	Status: 'Active' | 'Blocked' | 'Frozen';
+	Type: 'Debit' | 'Credit';
+};
+
 // Function to safely encode to base64 (works in both browser and Node.js)
 function base64Encode(str: string): string {
 	if (typeof window !== 'undefined') {
@@ -188,4 +197,8 @@ export async function getCallerHistory(): Promise<CallerHistoryItem[]> {
 
 export async function getClients(): Promise<ClientItem[]> {
 	return fetchAirtableData<ClientItem>('clients');
+}
+
+export async function getCards(): Promise<CardItem[]> {
+	return fetchAirtableData<CardItem>('cards');
 }

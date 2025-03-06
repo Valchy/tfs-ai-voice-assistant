@@ -5,7 +5,7 @@ import { Dropdown, DropdownButton } from '@/components/dropdown';
 import { Navbar, NavbarItem, NavbarSection, NavbarSpacer } from '@/components/navbar';
 import { Sidebar, SidebarBody, SidebarFooter, SidebarHeader, SidebarItem, SidebarLabel, SidebarSection } from '@/components/sidebar';
 import { SidebarLayout } from '@/components/sidebar-layout';
-import { PhoneIcon, UserIcon } from '@heroicons/react/20/solid';
+import { CreditCardIcon, HomeIcon, UserIcon } from '@heroicons/react/20/solid';
 import { usePathname } from 'next/navigation';
 
 export function ApplicationLayout({ children }: { children: React.ReactNode }) {
@@ -39,12 +39,16 @@ export function ApplicationLayout({ children }: { children: React.ReactNode }) {
 					<SidebarBody>
 						<SidebarSection>
 							<SidebarItem href="/" current={pathname === '/'}>
-								<PhoneIcon />
-								<SidebarLabel>Caller History</SidebarLabel>
+								<HomeIcon />
+								<SidebarLabel>Dashboard</SidebarLabel>
 							</SidebarItem>
 							<SidebarItem href="/clients" current={pathname.startsWith('/clients')}>
 								<UserIcon />
 								<SidebarLabel>Clients</SidebarLabel>
+							</SidebarItem>
+							<SidebarItem href="/cards" current={pathname.startsWith('/cards')}>
+								<CreditCardIcon />
+								<SidebarLabel>Cards</SidebarLabel>
 							</SidebarItem>
 						</SidebarSection>
 					</SidebarBody>
