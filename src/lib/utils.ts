@@ -12,16 +12,27 @@ export function getBaseUrl(req?: any) {
 }
 
 /**
- * Formats a card number by adding a space every 4 digits
+ * Formats a card number by masking middle digits and adding spaces
  * @param cardNumber The raw card number string
- * @returns Formatted card number with spaces
+ * @returns Formatted card number with first 4 and last 4 digits visible
  */
 export function formatCardNumber(cardNumber: string): string {
 	if (!cardNumber) return '-';
 	// Remove any existing spaces and non-digit characters
 	const cleaned = cardNumber.replace(/\D/g, '');
-	// Add a space every 4 characters
-	return cleaned.replace(/(.{4})/g, '$1 ').trim();
+
+	// Check if we have at least 8 digits (4 for start, 4 for end)
+	if (cleaned.length < 8) return cleaned;
+
+	// Get first 4 and last 4 digits
+	const first4 = cleaned.slice(0, 4);
+	const last4 = cleaned.slice(-4);
+	// Calculate number of middle digits to mask
+	const middleLength = cleaned.length - 8;
+	const maskedMiddle = '•'.repeat(middleLength);
+
+	// Format with spaces
+	return `${first4} ${maskedMiddle.match(/.{1,4}/g)?.join(' ') || ''} ${last4}`;
 }
 
 /**

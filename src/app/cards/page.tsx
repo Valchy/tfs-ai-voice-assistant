@@ -10,29 +10,8 @@ import { getCards } from '@/data';
 import { formatCardNumber, formatPhoneNumber } from '@/lib/utils';
 import { Suspense } from 'react';
 
-// Define color types based on badge component
-type BadgeColorType =
-	| 'red'
-	| 'orange'
-	| 'amber'
-	| 'yellow'
-	| 'lime'
-	| 'green'
-	| 'emerald'
-	| 'teal'
-	| 'cyan'
-	| 'sky'
-	| 'blue'
-	| 'indigo'
-	| 'violet'
-	| 'purple'
-	| 'fuchsia'
-	| 'pink'
-	| 'rose'
-	| 'zinc';
-
 // Function to determine the appropriate color for status badges
-function getStatusColor(status: string): BadgeColorType {
+function getStatusColor(status: string): 'green' | 'red' | 'sky' | 'zinc' {
 	switch (status) {
 		case 'Active':
 			return 'green';
@@ -46,7 +25,7 @@ function getStatusColor(status: string): BadgeColorType {
 }
 
 // Function to determine the appropriate color for type badges
-function getTypeColor(type: string): BadgeColorType {
+function getTypeColor(type: string): 'amber' | 'zinc' | 'indigo' {
 	switch (type) {
 		case 'Debit':
 			return 'indigo';

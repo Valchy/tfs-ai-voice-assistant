@@ -15,19 +15,20 @@ import { getCallerHistory } from '@/data';
 import { formatPhoneNumber } from '@/lib/utils';
 import { Suspense } from 'react';
 
+// Map for Call Type styles
+const callTypeStyles: Record<string, { color: 'zinc' | 'indigo' | 'amber' | 'red' | 'sky' | 'green' }> = {
+	'No Action': { color: 'zinc' },
+	'Question Asked': { color: 'indigo' },
+	'Fraud Alert': { color: 'amber' },
+	'Card Blocked': { color: 'red' },
+	'Card Unblocked': { color: 'sky' },
+	'Card Application': { color: 'green' },
+};
+
 // Separate data-fetching component
 async function CallerHistoryContent() {
 	const callerHistory = await getCallerHistory();
-
-	// Map for Call Type styles
-	const callTypeStyles: Record<string, { color: 'zinc' | 'indigo' | 'amber' | 'red' | 'sky' | 'green' }> = {
-		'No Action': { color: 'zinc' },
-		'Question Asked': { color: 'indigo' },
-		'Fraud Alert': { color: 'amber' },
-		'Card Blocked': { color: 'red' },
-		'Card Unblocked': { color: 'sky' },
-		'Card Application': { color: 'green' },
-	};
+	console.log(`Rendering caller history with ${callerHistory.length} records`);
 
 	return (
 		<>
