@@ -14,13 +14,13 @@ type CallerHistoryItem = {
 type ClientItem = {
 	id: string;
 	Name: string;
+	Email: string;
 	Phone: string;
 	'Passport Number': string;
 	Birthday: string;
 	'Card Number': string;
 	Address: string;
 	'Card Status': string[];
-	Notes?: string;
 };
 
 // Function to safely encode to base64 (works in both browser and Node.js)

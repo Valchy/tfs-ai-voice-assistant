@@ -73,10 +73,10 @@ export function PageWrapper({ children, title }: PageWrapperProps) {
 			<div className="flex items-end justify-between gap-4">
 				{title}
 				<div className="flex gap-2">
-					<Button onClick={handleRefresh} className="-my-0.5" disabled={isLoading}>
+					<Button onClick={handleRefresh} className="-my-0.5 bg-transparent p-2 opacity-70 transition-opacity hover:opacity-100" disabled={isLoading}>
 						{isLoading ? (
 							<div className="flex items-center">
-								<svg className="mr-2 -ml-1 h-4 w-4 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+								<svg className="text-foreground h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
 									<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
 									<path
 										className="opacity-75"
@@ -84,10 +84,24 @@ export function PageWrapper({ children, title }: PageWrapperProps) {
 										d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
 									></path>
 								</svg>
-								Refreshing...
 							</div>
 						) : (
-							'Refresh Data'
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="16"
+								height="16"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								strokeWidth="2"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								className="text-muted-foreground"
+								aria-label="Refresh data"
+							>
+								<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+								<path d="M3 3v5h5"></path>
+							</svg>
 						)}
 					</Button>
 				</div>

@@ -6,14 +6,9 @@ import { PageWrapper } from '@/components/page-wrapper';
 import { TableSkeleton } from '@/components/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/table';
 import { getClients } from '@/data';
-import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { PhoneButton } from './phone-button';
 import { SmsButton } from './sms-button';
-
-export const metadata: Metadata = {
-	title: 'Clients',
-};
 
 // Separate data-fetching component
 async function ClientsTableContent() {
@@ -25,10 +20,9 @@ async function ClientsTableContent() {
 			<TableHead>
 				<TableRow>
 					<TableHeader>Name</TableHeader>
-					<TableHeader>Phone Number</TableHeader>
-					<TableHeader>Passport Number</TableHeader>
-					<TableHeader>Card Status</TableHeader>
-					<TableHeader>Notes</TableHeader>
+					<TableHeader>Phone</TableHeader>
+					<TableHeader>Email</TableHeader>
+					<TableHeader>Birthday</TableHeader>
 					<TableHeader>Action</TableHeader>
 				</TableRow>
 			</TableHead>
@@ -38,9 +32,8 @@ async function ClientsTableContent() {
 						<TableRow key={client.id} title={`Client: ${client.Name || '-'}`}>
 							<TableCell>{client.Name || '-'}</TableCell>
 							<TableCell>{client.Phone || '-'}</TableCell>
-							<TableCell>{client.PassportNumber || '-'}</TableCell>
-							<TableCell>{client.CardStatus?.join(', ') || '-'}</TableCell>
-							<TableCell className="max-w-xs truncate">{client.Notes || '-'}</TableCell>
+							<TableCell>{client.Email || '-'}</TableCell>
+							<TableCell>{client.Birthday}</TableCell>
 							<TableCell>
 								<div className="flex space-x-2">
 									<PhoneButton phone={client.Phone} name={client.Name} />

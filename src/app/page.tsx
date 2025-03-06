@@ -38,11 +38,12 @@ async function CallerHistoryContent() {
 
 	// Map for Call Type styles
 	const callTypeStyles: Record<string, { color: BadgeColor }> = {
-		'-': { color: 'zinc' },
-		'Ask a question': { color: 'indigo' },
-		'Fraud alert': { color: 'amber' },
-		'Block or unblock a card': { color: 'sky' },
-		'Apply for a card': { color: 'green' },
+		'No Action': { color: 'zinc' },
+		'Question Asked': { color: 'indigo' },
+		'Fraud Alert': { color: 'amber' },
+		'Card Blocked': { color: 'red' },
+		'Card Unblocked': { color: 'sky' },
+		'Card Application': { color: 'green' },
 	};
 
 	return (
