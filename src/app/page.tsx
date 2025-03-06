@@ -103,7 +103,13 @@ export default function Home() {
 					<>
 						<StatsSkeleton />
 						<Subheading className="mt-14">Recent calls</Subheading>
-						<TableSkeleton rows={5} cols={1} />
+						<TableSkeleton
+							rows={5}
+							cols={5}
+							className="mt-4"
+							headers={['Name', 'Phone', 'Date', 'Call Type', 'Notes']}
+							colWidths={['w-1/5', 'w-1/5', 'w-1/5', 'w-1/5', 'w-1/5']}
+						/>
 					</>
 				}
 			>

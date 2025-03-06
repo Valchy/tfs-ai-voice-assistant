@@ -6,13 +6,13 @@ export function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivEl
 	return <div className={cn('animate-pulse rounded-md bg-zinc-200 dark:bg-zinc-800', className)} {...props} />;
 }
 
-export function TableRowSkeleton({ cols }: { cols: number }) {
+export function TableRowSkeleton({ cols, colWidths }: { cols: number; colWidths?: string[] }) {
 	return (
 		<tr className="border-b border-zinc-200 dark:border-zinc-800">
 			{Array(cols)
 				.fill(0)
 				.map((_, i) => (
-					<td key={i} className="px-4 py-3">
+					<td key={i} className={cn('px-4 py-3', colWidths ? colWidths[i] : '')}>
 						<Skeleton className="h-6 w-full" />
 					</td>
 				))}
@@ -20,26 +20,36 @@ export function TableRowSkeleton({ cols }: { cols: number }) {
 	);
 }
 
-export function TableSkeleton({ rows = 5, cols = 4, className }: { rows?: number; cols?: number; className?: string }) {
+export function TableSkeleton({
+	rows = 5,
+	cols = 4,
+	className = '',
+	headers,
+	colWidths,
+}: {
+	rows?: number;
+	cols?: number;
+	className?: string;
+	headers?: string[];
+	colWidths?: string[];
+}) {
 	return (
 		<div className={cn('w-full overflow-auto', className)}>
 			<table className="w-full caption-bottom">
 				<thead>
 					<tr className="border-b border-zinc-200 dark:border-zinc-800">
-						{Array(cols)
-							.fill(0)
-							.map((_, i) => (
-								<th key={i} className="px-4 py-3 text-left align-middle font-medium">
-									<Skeleton className="h-6 w-24" />
-								</th>
-							))}
+						{(headers || Array(cols).fill(0)).map((header, i) => (
+							<th key={i} className={cn('px-4 py-3 text-left align-middle font-medium', colWidths ? colWidths[i] : '')}>
+								<Skeleton className="h-6 w-24" />
+							</th>
+						))}
 					</tr>
 				</thead>
 				<tbody>
 					{Array(rows)
 						.fill(0)
 						.map((_, i) => (
-							<TableRowSkeleton key={i} cols={cols} />
+							<TableRowSkeleton key={i} cols={headers?.length || cols} colWidths={colWidths} />
 						))}
 				</tbody>
 			</table>
