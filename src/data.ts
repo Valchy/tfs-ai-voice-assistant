@@ -3,9 +3,10 @@ import { getBaseUrl } from './lib/utils';
 // Define the caller history type based on what we expect from Airtable
 type CallerHistoryItem = {
 	id: string;
-	Name: string;
 	Phone: string;
+	Name: string;
 	Date: string;
+	'Call Type': string;
 	Notes?: string;
 };
 
@@ -14,11 +15,11 @@ type ClientItem = {
 	id: string;
 	Name: string;
 	Phone: string;
-	PassportNumber: string;
+	'Passport Number': string;
 	Birthday: string;
-	CardNumber: string;
+	'Card Number': string;
 	Address: string;
-	CardStatus: string[];
+	'Card Status': string[];
 	Notes?: string;
 };
 

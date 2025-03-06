@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server';
 export function middleware(request: NextRequest) {
 	// Skip authentication for the Twilio webhook endpoint
 	// as it handles its own authentication via query parameters
-	if (request.nextUrl.pathname.startsWith('/api/twilio/webhook')) {
+	if (request.nextUrl.pathname.startsWith('/api/twilio/webhook') || request.nextUrl.pathname.startsWith('/api/airtable/add/caller')) {
 		const response = NextResponse.next();
 
 		// Add cache control headers

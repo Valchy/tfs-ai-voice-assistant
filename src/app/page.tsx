@@ -2,6 +2,7 @@
 export const dynamic = 'force-dynamic';
 
 import { Stat } from '@/app/stat';
+import { Badge } from '@/components/badge';
 import { Heading, Subheading } from '@/components/heading';
 import { PageWrapper } from '@/components/page-wrapper';
 import { Select } from '@/components/select';
@@ -10,9 +11,39 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { getCallerHistory } from '@/data';
 import { Suspense } from 'react';
 
+// Define allowed badge colors
+type BadgeColor =
+	| 'red'
+	| 'orange'
+	| 'amber'
+	| 'yellow'
+	| 'lime'
+	| 'green'
+	| 'emerald'
+	| 'teal'
+	| 'cyan'
+	| 'sky'
+	| 'blue'
+	| 'indigo'
+	| 'violet'
+	| 'purple'
+	| 'fuchsia'
+	| 'pink'
+	| 'rose'
+	| 'zinc';
+
 // Separate data-fetching component
 async function CallerHistoryContent() {
 	const callerHistory = await getCallerHistory();
+
+	// Map for Call Type styles
+	const callTypeStyles: Record<string, { color: BadgeColor }> = {
+		'-': { color: 'zinc' },
+		'Ask a question': { color: 'indigo' },
+		'Fraud alert': { color: 'amber' },
+		'Block or unblock a card': { color: 'sky' },
+		'Apply for a card': { color: 'green' },
+	};
 
 	return (
 		<>
@@ -28,8 +59,9 @@ async function CallerHistoryContent() {
 				<TableHead>
 					<TableRow>
 						<TableHeader>Name</TableHeader>
-						<TableHeader>Phone Number</TableHeader>
-						<TableHeader>Call Date</TableHeader>
+						<TableHeader>Phone</TableHeader>
+						<TableHeader>Date</TableHeader>
+						<TableHeader>Call Type</TableHeader>
 						<TableHeader>Notes</TableHeader>
 					</TableRow>
 				</TableHead>
@@ -40,12 +72,17 @@ async function CallerHistoryContent() {
 								<TableCell>{caller.Name || '-'}</TableCell>
 								<TableCell>{caller.Phone || '-'}</TableCell>
 								<TableCell>{caller.Date || '-'}</TableCell>
-								<TableCell className="max-w-xs truncate">{caller.Notes || '-'}</TableCell>
+								<TableCell>
+									<Badge color={callTypeStyles[caller['Call Type'] || '-']?.color || 'zinc'} className="px-3 py-1">
+										{caller['Call Type'] || '-'}
+									</Badge>
+								</TableCell>
+								<TableCell className="max-w-full truncate">{caller.Notes || '-'}</TableCell>
 							</TableRow>
 						))
 					) : (
 						<TableRow>
-							<TableCell colSpan={4} className="py-8 text-center text-zinc-500">
+							<TableCell colSpan={5} className="py-8 text-center text-zinc-500">
 								No caller history found. Check your Airtable connection.
 							</TableCell>
 						</TableRow>
