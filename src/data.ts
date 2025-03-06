@@ -39,7 +39,7 @@ async function fetchAirtableData<T>(endpoint: string): Promise<T[]> {
 		// Add a cache-busting parameter to ensure we always get fresh data
 		const cacheBuster = `cacheBust=${Date.now()}`;
 		const baseUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://app.valchy.ai';
-		const url = `${baseUrl}/api/airtable/${endpoint}?${cacheBuster}`;
+		const url = `${baseUrl}/api/airtable/get/${endpoint}?${cacheBuster}`;
 
 		console.log('Fetching from URL:', url);
 
@@ -131,10 +131,61 @@ export async function initiateVoiceflowCall(phoneNumber: string): Promise<boolea
 	}
 }
 
+// Function to send an SMS message
+export async function sendSmsMessage(phoneNumber: string, message: string): Promise<boolean> {
+	try {
+		console.log(`Sending SMS to phone number: ${phoneNumber} with message: ${message}`);
+
+		// Build the base URL for the Twilio SMS endpoint
+		const baseUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://app.valchy.ai';
+		const url = `${baseUrl}/api/twilio/sms/send`;
+
+		// Get the auth credentials from environment variables
+		const username = process.env.NEXT_PUBLIC_BASIC_AUTH_USERNAME;
+		const password = process.env.NEXT_PUBLIC_BASIC_AUTH_PASSWORD;
+
+		// Create headers object with content type
+		const headers: HeadersInit = {
+			'Content-Type': 'application/json',
+		};
+
+		// Add Basic Auth header if credentials are available
+		if (username && password) {
+			const base64Credentials = base64Encode(`${username}:${password}`);
+			headers['Authorization'] = `Basic ${base64Credentials}`;
+		}
+
+		const response = await fetch(url, {
+			method: 'POST',
+			headers,
+			body: JSON.stringify({
+				to: phoneNumber, // Twilio endpoint expects 'to' instead of 'phone'
+				message: message,
+			}),
+			cache: 'no-store',
+		});
+
+		console.log('SMS API response status:', response.status);
+
+		if (!response.ok) {
+			const errorData = await response.json().catch(() => null);
+			console.error('SMS API error details:', errorData);
+			throw new Error(`Failed to send SMS: ${response.status} ${response.statusText}`);
+		}
+
+		const data = await response.json();
+		console.log('SMS API response:', data);
+		return data.success || false;
+	} catch (error) {
+		console.error('Error sending SMS:', error);
+		return false;
+	}
+}
+
 export async function getCallerHistory(): Promise<CallerHistoryItem[]> {
-	return fetchAirtableData<CallerHistoryItem>('get-caller-history');
+	return fetchAirtableData<CallerHistoryItem>('caller-history');
 }
 
 export async function getClients(): Promise<ClientItem[]> {
-	return fetchAirtableData<ClientItem>('get-clients');
+	return fetchAirtableData<ClientItem>('clients');
 }

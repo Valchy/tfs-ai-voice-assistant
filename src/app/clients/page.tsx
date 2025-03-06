@@ -9,6 +9,7 @@ import { getClients } from '@/data';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { PhoneButton } from './phone-button';
+import { SmsButton } from './sms-button';
 
 export const metadata: Metadata = {
 	title: 'Clients',
@@ -41,7 +42,10 @@ async function ClientsTableContent() {
 							<TableCell>{client.CardStatus?.join(', ') || '-'}</TableCell>
 							<TableCell className="max-w-xs truncate">{client.Notes || '-'}</TableCell>
 							<TableCell>
-								<PhoneButton phone={client.Phone} name={client.Name} />
+								<div className="flex space-x-2">
+									<PhoneButton phone={client.Phone} name={client.Name} />
+									<SmsButton phone={client.Phone} name={client.Name} />
+								</div>
 							</TableCell>
 						</TableRow>
 					))
