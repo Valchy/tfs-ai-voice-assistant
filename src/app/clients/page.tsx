@@ -1,64 +1,65 @@
+'use client';
+
 // Disable static generation and ensure this page is dynamically rendered
 export const dynamic = 'force-dynamic';
 
 import { Heading } from '@/components/heading';
 import { PageWrapper } from '@/components/page-wrapper';
+import { DataItem, SearchableTable } from '@/components/searchable-table';
 import { TableSkeleton } from '@/components/skeleton';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/table';
 import { getClients } from '@/data';
-import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { PhoneButton } from './phone-button';
 import { SmsButton } from './sms-button';
 
-export const metadata: Metadata = {
-	title: 'Clients',
+// Client type definition
+export type Client = DataItem & {
+	Name?: string;
+	Phone?: string;
+	PassportNumber?: string;
+	CardStatus?: string[];
+	Notes?: string;
 };
+
+// Client table component with search functionality
+function ClientsTable({ clients }: { clients: Client[] }) {
+	// Define columns for the table
+	const columns = [
+		{ key: 'Name', header: 'Name' },
+		{ key: 'Phone', header: 'Phone Number' },
+		{ key: 'Email', header: 'Email' },
+		{ key: 'Birthday', header: 'Birthday' },
+		{
+			key: 'actions',
+			header: 'Action',
+			render: (client: Client) => (
+				<div className="flex space-x-2">
+					<PhoneButton phone={client.Phone || ''} name={client.Name || ''} />
+					<SmsButton phone={client.Phone || ''} name={client.Name || ''} />
+				</div>
+			),
+		},
+	];
+
+	return (
+		<SearchableTable
+			data={clients}
+			searchKeys={['Name', 'Phone', 'Passport Number', 'Notes']}
+			columns={columns}
+			emptyMessage="No clients found. Check your Airtable connection."
+			noResultsMessage="No matching clients found."
+			searchPlaceholder="Search clients..."
+			className="mt-6"
+		/>
+	);
+}
 
 // Separate data-fetching component
 async function ClientsTableContent() {
 	const clients = await getClients();
 	console.log(`Rendering client page with ${clients.length} client records`);
 
-	return (
-		<Table className="mt-8 [--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
-			<TableHead>
-				<TableRow>
-					<TableHeader>Name</TableHeader>
-					<TableHeader>Phone Number</TableHeader>
-					<TableHeader>Passport Number</TableHeader>
-					<TableHeader>Card Status</TableHeader>
-					<TableHeader>Notes</TableHeader>
-					<TableHeader>Action</TableHeader>
-				</TableRow>
-			</TableHead>
-			<TableBody>
-				{clients.length > 0 ? (
-					clients.map(client => (
-						<TableRow key={client.id} title={`Client: ${client.Name || '-'}`}>
-							<TableCell>{client.Name || '-'}</TableCell>
-							<TableCell>{client.Phone || '-'}</TableCell>
-							<TableCell>{client.PassportNumber || '-'}</TableCell>
-							<TableCell>{client.CardStatus?.join(', ') || '-'}</TableCell>
-							<TableCell className="max-w-xs truncate">{client.Notes || '-'}</TableCell>
-							<TableCell>
-								<div className="flex space-x-2">
-									<PhoneButton phone={client.Phone} name={client.Name} />
-									<SmsButton phone={client.Phone} name={client.Name} />
-								</div>
-							</TableCell>
-						</TableRow>
-					))
-				) : (
-					<TableRow>
-						<TableCell colSpan={6} className="py-8 text-center text-zinc-500">
-							No clients found. Check your Airtable connection.
-						</TableCell>
-					</TableRow>
-				)}
-			</TableBody>
-		</Table>
-	);
+	return <ClientsTable clients={clients} />;
 }
 
 export default function ClientsPage() {
