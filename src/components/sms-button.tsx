@@ -6,6 +6,7 @@ import { Dialog, DialogActions, DialogDescription, DialogTitle } from '@/compone
 import { Text } from '@/components/text';
 import { Textarea } from '@/components/textarea';
 import { sendSmsMessage } from '@/data';
+import { unformatPhoneNumber } from '@/lib/utils';
 import { ChatBubbleLeftIcon } from '@heroicons/react/20/solid';
 import { useState } from 'react';
 
@@ -44,8 +45,11 @@ export function SmsButton({ phone, name }: { phone: string; name: string }) {
 		setIsLoading(true);
 
 		try {
+			// Unformat the phone number before sending to API
+			const unformattedPhone = unformatPhoneNumber(phone);
+
 			// Send the SMS message
-			const success = await sendSmsMessage(phone, message);
+			const success = await sendSmsMessage(unformattedPhone, message);
 
 			if (success) {
 				setAlertState({
