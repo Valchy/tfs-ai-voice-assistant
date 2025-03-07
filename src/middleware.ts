@@ -10,7 +10,7 @@ export function middleware(request: NextRequest) {
 	// Skip authentication for the Twilio webhook endpoint
 	// as it handles its own authentication via query parameters
 	if (
-		request.nextUrl.pathname.startsWith('/api/twilio/webhook') ||
+		request.nextUrl.pathname.startsWith('/api/twilio') ||
 		request.nextUrl.pathname.startsWith('/api/airtable/add/caller') ||
 		request.nextUrl.pathname.match(/^\/api\/airtable\/get\/clients\/.*$/)
 	) {

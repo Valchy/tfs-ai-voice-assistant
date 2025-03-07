@@ -6,8 +6,30 @@ const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
 
+// Basic auth credentials
+const AUTH_USERNAME = process.env.NEXT_PUBLIC_BASIC_AUTH_USERNAME || '';
+const AUTH_PASSWORD = process.env.NEXT_PUBLIC_BASIC_AUTH_PASSWORD || '';
+
 export async function POST(request: NextRequest) {
 	try {
+		// Get authentication from query parameters
+		const searchParams = request.nextUrl.searchParams;
+		const username = searchParams.get('username');
+		const password = searchParams.get('password');
+
+		// Check authentication if credentials are configured
+		if (AUTH_USERNAME && AUTH_PASSWORD) {
+			if (!username || !password || username !== AUTH_USERNAME || password !== AUTH_PASSWORD) {
+				return NextResponse.json(
+					{
+						success: false,
+						error: 'Invalid authentication credentials',
+					},
+					{ status: 401 },
+				);
+			}
+		}
+
 		// Ensure Twilio credentials are available
 		if (!accountSid || !authToken || !twilioPhoneNumber) {
 			return NextResponse.json(
