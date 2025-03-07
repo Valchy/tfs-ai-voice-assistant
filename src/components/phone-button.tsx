@@ -5,7 +5,6 @@ import { Button } from '@/components/button';
 import { Dialog, DialogActions, DialogDescription, DialogTitle } from '@/components/dialog';
 import { Text } from '@/components/text';
 import { initiateVoiceflowCall } from '@/data';
-import { unformatPhoneNumber } from '@/lib/utils';
 import { PhoneIcon } from '@heroicons/react/20/solid';
 import { useState } from 'react';
 
@@ -34,11 +33,8 @@ export function PhoneButton({ phone, name }: { phone: string; name: string }) {
 		setIsLoading(true);
 
 		try {
-			// Unformat the phone number before sending to API
-			const unformattedPhone = unformatPhoneNumber(phone);
-
 			// Make the call to the API using the centralized function
-			const success = await initiateVoiceflowCall(unformattedPhone, name);
+			const success = await initiateVoiceflowCall(phone, name);
 
 			if (success) {
 				setAlertState({

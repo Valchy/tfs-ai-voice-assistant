@@ -12,18 +12,6 @@ export function getBaseUrl(req?: any) {
 }
 
 /**
- * Unformats a phone number by removing spaces and formatting characters
- * @param formattedPhone The formatted phone number string
- * @returns Raw phone number with only digits and possibly a leading plus sign
- */
-export function unformatPhoneNumber(formattedPhone: string): string {
-	if (!formattedPhone) return '';
-
-	// Preserve the plus sign if present, but remove all other non-digit characters
-	return formattedPhone.replace(/[^\d+]/g, '');
-}
-
-/**
  * Formats a card number by masking middle digits and adding spaces
  * @param cardNumber The raw card number string
  * @returns Formatted card number with first 4 and last 4 digits visible
