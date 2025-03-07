@@ -1,6 +1,10 @@
 import Airtable from 'airtable';
 import { NextResponse } from 'next/server';
 
+// Get Airtable credentials from environment variables
+const apiKey = process.env.AIRTABLE_API_KEY;
+const baseId = process.env.AIRTABLE_BASE_ID;
+
 /**
  * Fetches records from an Airtable table
  * @param tableName The name of the table to fetch data from
@@ -9,10 +13,6 @@ import { NextResponse } from 'next/server';
  */
 export async function fetchAirtableRecords(tableName: string, errorMessage: string = 'Failed to fetch data') {
 	try {
-		// Get Airtable credentials from environment variables
-		const apiKey = process.env.AIRTABLE_API_KEY;
-		const baseId = process.env.AIRTABLE_BASE_ID;
-
 		// Validate Airtable environment variables
 		if (!apiKey || !baseId || !tableName) {
 			throw new Error('Airtable environment variables are not properly configured');

@@ -1,6 +1,14 @@
 import Airtable from 'airtable';
 import { NextRequest, NextResponse } from 'next/server';
 
+// Get Airtable credentials from environment variables
+const apiKey = process.env.AIRTABLE_API_KEY;
+const baseId = process.env.AIRTABLE_BASE_ID;
+
+// Basic auth credentials from environment variables
+const AUTH_USERNAME = process.env.NEXT_PUBLIC_BASIC_AUTH_USERNAME;
+const AUTH_PASSWORD = process.env.NEXT_PUBLIC_BASIC_AUTH_PASSWORD;
+
 /**
  * GET /api/airtable/get/clients/{phone}
  *
@@ -32,13 +40,9 @@ export async function GET(request: NextRequest, { params }: { params: { phone: s
 		const username = searchParams.get('username');
 		const password = searchParams.get('password');
 
-		// Get expected credentials from environment variables
-		const expectedUsername = process.env.NEXT_PUBLIC_BASIC_AUTH_USERNAME || '';
-		const expectedPassword = process.env.NEXT_PUBLIC_BASIC_AUTH_PASSWORD || '';
-
 		// Validate credentials if environment variables are set
-		if (expectedUsername && expectedPassword) {
-			if (!username || !password || username !== expectedUsername || password !== expectedPassword) {
+		if (AUTH_USERNAME && AUTH_PASSWORD) {
+			if (!username || !password || username !== AUTH_USERNAME || password !== AUTH_PASSWORD) {
 				return NextResponse.json(
 					{
 						success: false,
@@ -54,10 +58,6 @@ export async function GET(request: NextRequest, { params }: { params: { phone: s
 			}
 		}
 
-		// Get Airtable credentials from environment variables
-		const apiKey = process.env.AIRTABLE_API_KEY;
-		const baseId = process.env.AIRTABLE_BASE_ID;
-
 		// Validate Airtable environment variables
 		if (!apiKey || !baseId) {
 			throw new Error('Airtable environment variables are not properly configured');
@@ -66,17 +66,26 @@ export async function GET(request: NextRequest, { params }: { params: { phone: s
 		// Initialize Airtable
 		const base = new Airtable({ apiKey }).base(baseId);
 
-		// Format the phone number to search (removing any non-digit characters)
-		const formattedPhoneNumber = phone.replace(/\D/g, '');
+		// Decode the URL-encoded phone number and then format it
+		const decodedPhone = decodeURIComponent(phone);
 
-		// Fetch records from the Clients table that match the phone number
+		// Format the phone number to search - keep only digits
+		// (this removes the '+' and any other non-digit characters)
+		const formattedPhoneNumber = decodedPhone.replace(/\D/g, '');
+
+		console.log('Searching for phone:', decodedPhone, '=>', formattedPhoneNumber);
+
+		// Fetch records from the Clients table with exact phone number match
 		const records = await base('Clients')
 			.select({
-				filterByFormula: `FIND("${formattedPhoneNumber}", SUBSTITUTE(Phone, "-", "")) > 0`,
+				filterByFormula: `OR(
+					SUBSTITUTE(Phone, "-", "") = "${formattedPhoneNumber}",
+					SUBSTITUTE(SUBSTITUTE(Phone, "+", ""), "-", "") = "${formattedPhoneNumber}"
+				)`,
 			})
 			.all();
 
-		// If no client found with that phone number
+		// Since phone is a primary key, we expect at most one result
 		if (records.length === 0) {
 			return NextResponse.json(
 				{

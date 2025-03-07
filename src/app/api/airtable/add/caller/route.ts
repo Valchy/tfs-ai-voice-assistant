@@ -19,8 +19,6 @@ function validateCredentials(username: string | null, password: string | null): 
 	return username === AUTH_USERNAME && password === AUTH_PASSWORD;
 }
 
-export const dynamic = 'force-dynamic'; // This prevents Edge and Vercel from caching
-
 export async function POST(request: NextRequest) {
 	try {
 		// Extract query parameters for authentication and data

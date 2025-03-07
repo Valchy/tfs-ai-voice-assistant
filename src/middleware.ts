@@ -1,6 +1,10 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
+// Get auth credentials from environment variables
+const BASIC_AUTH_USERNAME = process.env.NEXT_PUBLIC_BASIC_AUTH_USERNAME || '';
+const BASIC_AUTH_PASSWORD = process.env.NEXT_PUBLIC_BASIC_AUTH_PASSWORD || '';
+
 // This function runs for every request to handle authentication and cache control
 export function middleware(request: NextRequest) {
 	// Skip authentication for the Twilio webhook endpoint
@@ -8,7 +12,7 @@ export function middleware(request: NextRequest) {
 	if (
 		request.nextUrl.pathname.startsWith('/api/twilio/webhook') ||
 		request.nextUrl.pathname.startsWith('/api/airtable/add/caller') ||
-		request.nextUrl.pathname.match(/^\/api\/airtable\/get\/clients\/\d+$/)
+		request.nextUrl.pathname.match(/^\/api\/airtable\/get\/clients\/.*$/)
 	) {
 		const response = NextResponse.next();
 
@@ -23,12 +27,8 @@ export function middleware(request: NextRequest) {
 	// Get the Authorization header from the request
 	const authHeader = request.headers.get('Authorization');
 
-	// Get auth credentials from environment variables
-	const expectedUsername = process.env.NEXT_PUBLIC_BASIC_AUTH_USERNAME || '';
-	const expectedPassword = process.env.NEXT_PUBLIC_BASIC_AUTH_PASSWORD || '';
-
 	// Only check auth if credentials are set (to prevent locking ourselves out)
-	if (expectedUsername && expectedPassword) {
+	if (BASIC_AUTH_USERNAME && BASIC_AUTH_PASSWORD) {
 		// If there's no Authorization header or it doesn't start with "Basic ", return a 401
 		if (!authHeader || !authHeader.startsWith('Basic ')) {
 			return new NextResponse('Authentication required', {
@@ -48,7 +48,7 @@ export function middleware(request: NextRequest) {
 		const [username, password] = credentials.split(':');
 
 		// Check if the credentials are valid
-		if (username !== expectedUsername || password !== expectedPassword) {
+		if (username !== BASIC_AUTH_USERNAME || password !== BASIC_AUTH_PASSWORD) {
 			return new NextResponse('Invalid credentials', {
 				status: 401,
 				headers: {
