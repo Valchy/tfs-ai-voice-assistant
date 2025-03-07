@@ -96,12 +96,12 @@ async function fetchAirtableData<T>(endpoint: string): Promise<T[]> {
 }
 
 // Function to initiate a call via the Voiceflow API
-export async function initiateVoiceflowCall(phoneNumber: string): Promise<boolean> {
+export async function initiateVoiceflowCall(phoneNumber: string, name?: string): Promise<boolean> {
 	try {
 		console.log(`Initiating call to phone number: ${phoneNumber}`);
 
 		// Build the base URL for the call endpoint
-		const url = `${getBaseUrl()}/api/voiceflow/call?phone=${encodeURIComponent(phoneNumber)}`;
+		const url = `${getBaseUrl()}/api/voiceflow/call?phone=${encodeURIComponent(phoneNumber)}&name=${encodeURIComponent(name || '')}`;
 
 		// Get the auth credentials from environment variables
 		const username = process.env.NEXT_PUBLIC_BASIC_AUTH_USERNAME;

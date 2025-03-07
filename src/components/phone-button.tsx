@@ -34,7 +34,7 @@ export function PhoneButton({ phone, name }: { phone: string; name: string }) {
 
 		try {
 			// Make the call to the API using the centralized function
-			const success = await initiateVoiceflowCall(phone);
+			const success = await initiateVoiceflowCall(phone, name);
 
 			if (success) {
 				setAlertState({
