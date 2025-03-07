@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 // Get Voiceflow credentials from environment variables
 const VOICEFLOW_DM_API_KEY = process.env.VOICEFLOW_DM_API_KEY;
+const VOICEFLOW_PHONE_NUMBER = process.env.VOICEFLOW_PHONE_NUMBER;
 
 export async function GET(request: NextRequest) {
 	try {
@@ -33,7 +34,7 @@ export async function GET(request: NextRequest) {
 		}
 
 		// Call the Voiceflow API
-		const response = await fetch('https://runtime-api.voiceflow.com/v1alpha1/phone-number/6762928d7edb2c774af35435/outbound', {
+		const response = await fetch(`https://runtime-api.voiceflow.com/v1alpha1/phone-number/${VOICEFLOW_PHONE_NUMBER}/outbound`, {
 			method: 'POST',
 			headers: {
 				'Authorization': VOICEFLOW_DM_API_KEY,
@@ -41,7 +42,7 @@ export async function GET(request: NextRequest) {
 			},
 			body: JSON.stringify({
 				to: phoneNumber,
-				variables: { fraud_alert: 'yes', name: name || '' },
+				variables: { fraud_alert: 'yes', user_name: name || '' },
 			}),
 		});
 
