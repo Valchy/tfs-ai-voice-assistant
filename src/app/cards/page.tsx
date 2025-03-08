@@ -72,7 +72,7 @@ async function CardsTableContent() {
 								</TableCell>
 								<TableCell>
 									<div className="flex space-x-2">
-										<AlertButton phone={card.Phone} name={`Card ${formatCardNumber(card['Card Number'])}`} />
+										<AlertButton phone={card.Phone} card={card['Card Number']} />
 									</div>
 								</TableCell>
 							</TableRow>

@@ -9,7 +9,7 @@ import { ExclamationTriangleIcon } from '@heroicons/react/20/solid';
 import { useState } from 'react';
 
 // Alert button component for fraud alerts
-export function AlertButton({ phone, name }: { phone: string; name: string }) {
+export function AlertButton({ phone, card, name = '' }: { phone: string; card: string; name: string }) {
 	const [isLoading, setIsLoading] = useState(false);
 	const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 	const [alertState, setAlertState] = useState<{
@@ -34,7 +34,7 @@ export function AlertButton({ phone, name }: { phone: string; name: string }) {
 
 		try {
 			// Make the call to the API using the centralized function with fraud_alert='yes'
-			const success = await initiateVoiceflowCall(phone, name, 'yes');
+			const success = await initiateVoiceflowCall(phone, card, name, 'yes');
 
 			if (success) {
 				setAlertState({
