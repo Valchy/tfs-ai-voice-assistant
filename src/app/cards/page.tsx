@@ -25,12 +25,14 @@ function getStatusColor(status: string): 'green' | 'red' | 'sky' | 'zinc' {
 }
 
 // Function to determine the appropriate color for type badges
-function getTypeColor(type: string): 'amber' | 'zinc' | 'indigo' {
+function getTypeColor(type: string): 'amber' | 'zinc' | 'indigo' | 'green' {
 	switch (type) {
 		case 'Debit':
 			return 'indigo';
 		case 'Credit':
 			return 'amber';
+		case 'Business':
+			return 'green';
 		default:
 			return 'zinc';
 	}
