@@ -17,7 +17,7 @@ type ClientItem = {
 	Email: string;
 	Phone: string;
 	Passport: string;
-	['Date of birth']: string;
+	['Birthdate']: string;
 	'Card Number': string;
 	'Card Status': string[];
 };

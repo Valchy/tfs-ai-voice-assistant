@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
 		// Get phone number from URL parameter
 		const url = new URL(request.url);
 		const phoneNumber = url.searchParams.get('phone');
-		const name = url.searchParams.get('name');
+		const name = url.searchParams.get('name') || '';
 		const fraudAlert = url.searchParams.get('fraudAlert') || 'no';
 
 		// Validate phone number parameter
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
 			},
 			body: JSON.stringify({
 				to: phoneNumber,
-				variables: { fraud_alert: fraudAlert, user_name: name || '' },
+				variables: { fraud_alert: fraudAlert, user_name: name },
 			}),
 		});
 
