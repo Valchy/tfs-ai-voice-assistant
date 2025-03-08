@@ -23,7 +23,7 @@ async function ClientsTableContent() {
 					<TableHeader>Name</TableHeader>
 					<TableHeader>Phone</TableHeader>
 					<TableHeader>Email</TableHeader>
-					<TableHeader>Birthday</TableHeader>
+					<TableHeader>Date of Birth</TableHeader>
 					<TableHeader>Action</TableHeader>
 				</TableRow>
 			</TableHead>
@@ -34,7 +34,7 @@ async function ClientsTableContent() {
 							<TableCell>{client.Name || '-'}</TableCell>
 							<TableCell>{formatPhoneNumber(client.Phone)}</TableCell>
 							<TableCell>{client.Email || '-'}</TableCell>
-							<TableCell>{client.Birthday}</TableCell>
+							<TableCell>{client['Date of Birth']}</TableCell>
 							<TableCell>
 								<div className="flex space-x-2">
 									<PhoneButton phone={client.Phone} name={client.Name} />
