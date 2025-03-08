@@ -1,6 +1,7 @@
 // Disable static generation and ensure this page is dynamically rendered
 export const dynamic = 'force-dynamic';
 
+import { AlertButton } from '@/components/alert-button';
 import { Badge } from '@/components/badge';
 import { Heading } from '@/components/heading';
 import { PageWrapper } from '@/components/page-wrapper';
@@ -25,14 +26,14 @@ function getStatusColor(status: string): 'green' | 'red' | 'sky' | 'zinc' {
 }
 
 // Function to determine the appropriate color for type badges
-function getTypeColor(type: string): 'amber' | 'zinc' | 'indigo' | 'green' {
+function getTypeColor(type: string): 'amber' | 'zinc' | 'indigo' | 'pink' {
 	switch (type) {
 		case 'Debit':
 			return 'indigo';
 		case 'Credit':
 			return 'amber';
 		case 'Business':
-			return 'green';
+			return 'pink';
 		default:
 			return 'zinc';
 	}
@@ -53,6 +54,7 @@ async function CardsTableContent() {
 						<TableHeader>Phone</TableHeader>
 						<TableHeader>Status</TableHeader>
 						<TableHeader>Type</TableHeader>
+						<TableHeader>Actions</TableHeader>
 					</TableRow>
 				</TableHead>
 				<TableBody>
@@ -68,11 +70,16 @@ async function CardsTableContent() {
 								<TableCell>
 									<Badge color={getTypeColor(card.Type)}>{card.Type}</Badge>
 								</TableCell>
+								<TableCell>
+									<div className="flex space-x-2">
+										<AlertButton phone={card.Phone} name={`Card ${formatCardNumber(card['Card Number'])}`} />
+									</div>
+								</TableCell>
 							</TableRow>
 						))
 					) : (
 						<TableRow>
-							<TableCell colSpan={5} className="py-8 text-center text-zinc-500">
+							<TableCell colSpan={6} className="py-8 text-center text-zinc-500">
 								No cards found. Check your Airtable connection.
 							</TableCell>
 						</TableRow>

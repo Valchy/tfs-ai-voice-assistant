@@ -17,41 +17,43 @@ async function ClientsTableContent() {
 	console.log(`Rendering client page with ${clients.length} client records`);
 
 	return (
-		<Table className="mt-8 [--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
-			<TableHead>
-				<TableRow>
-					<TableHeader>Name</TableHeader>
-					<TableHeader>Phone</TableHeader>
-					<TableHeader>Email</TableHeader>
-					<TableHeader>Date of Birth</TableHeader>
-					<TableHeader>Action</TableHeader>
-				</TableRow>
-			</TableHead>
-			<TableBody>
-				{clients.length > 0 ? (
-					clients.map(client => (
-						<TableRow key={client.id} title={`Client: ${client.Name || '-'}`}>
-							<TableCell>{client.Name || '-'}</TableCell>
-							<TableCell>{formatPhoneNumber(client.Phone)}</TableCell>
-							<TableCell>{client.Email || '-'}</TableCell>
-							<TableCell>{client['Date of Birth']}</TableCell>
-							<TableCell>
-								<div className="flex space-x-2">
-									<PhoneButton phone={client.Phone} name={client.Name} />
-									<SmsButton phone={client.Phone} name={client.Name} />
-								</div>
+		<div className="mt-8">
+			<Table className="mt-4 [--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
+				<TableHead>
+					<TableRow>
+						<TableHeader>Name</TableHeader>
+						<TableHeader>Phone</TableHeader>
+						<TableHeader>Email</TableHeader>
+						<TableHeader>Date of Birth</TableHeader>
+						<TableHeader>Actions</TableHeader>
+					</TableRow>
+				</TableHead>
+				<TableBody>
+					{clients.length > 0 ? (
+						clients.map(client => (
+							<TableRow key={client.id} title={`Client: ${client.Name || '-'}`}>
+								<TableCell>{client.Name || '-'}</TableCell>
+								<TableCell>{formatPhoneNumber(client.Phone)}</TableCell>
+								<TableCell>{client.Email || '-'}</TableCell>
+								<TableCell>{client['Date of birth']}</TableCell>
+								<TableCell>
+									<div className="flex space-x-2">
+										<PhoneButton phone={client.Phone} name={client.Name} />
+										<SmsButton phone={client.Phone} name={client.Name} />
+									</div>
+								</TableCell>
+							</TableRow>
+						))
+					) : (
+						<TableRow>
+							<TableCell colSpan={6} className="py-8 text-center text-zinc-500">
+								No clients found. Check your Airtable connection.
 							</TableCell>
 						</TableRow>
-					))
-				) : (
-					<TableRow>
-						<TableCell colSpan={6} className="py-8 text-center text-zinc-500">
-							No clients found. Check your Airtable connection.
-						</TableCell>
-					</TableRow>
-				)}
-			</TableBody>
-		</Table>
+					)}
+				</TableBody>
+			</Table>
+		</div>
 	);
 }
 

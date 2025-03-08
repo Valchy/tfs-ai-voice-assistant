@@ -5,11 +5,11 @@ import { Button } from '@/components/button';
 import { Dialog, DialogActions, DialogDescription, DialogTitle } from '@/components/dialog';
 import { Text } from '@/components/text';
 import { initiateVoiceflowCall } from '@/data';
-import { PhoneIcon } from '@heroicons/react/20/solid';
+import { ExclamationTriangleIcon } from '@heroicons/react/20/solid';
 import { useState } from 'react';
 
-// Phone button component
-export function PhoneButton({ phone, name }: { phone: string; name: string }) {
+// Alert button component for fraud alerts
+export function AlertButton({ phone, name }: { phone: string; name: string }) {
 	const [isLoading, setIsLoading] = useState(false);
 	const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 	const [alertState, setAlertState] = useState<{
@@ -22,30 +22,30 @@ export function PhoneButton({ phone, name }: { phone: string; name: string }) {
 		isSuccess: false,
 	});
 
-	const handleCallClick = (e: React.MouseEvent) => {
+	const handleAlertClick = (e: React.MouseEvent) => {
 		e.preventDefault();
 		e.stopPropagation();
 		setIsConfirmOpen(true);
 	};
 
-	const handleConfirmCall = async () => {
+	const handleConfirmAlert = async () => {
 		setIsConfirmOpen(false);
 		setIsLoading(true);
 
 		try {
-			// Make the call to the API using the centralized function with explicit fraud_alert='no'
-			const success = await initiateVoiceflowCall(phone, name, 'no');
+			// Make the call to the API using the centralized function with fraud_alert='yes'
+			const success = await initiateVoiceflowCall(phone, name, 'yes');
 
 			if (success) {
 				setAlertState({
 					isOpen: true,
-					message: `Call to ${name} initiated successfully.`,
+					message: `Fraud alert call to ${name} initiated successfully.`,
 					isSuccess: true,
 				});
 			} else {
 				setAlertState({
 					isOpen: true,
-					message: `Failed to initiate call to ${name}.`,
+					message: `Failed to initiate fraud alert call to ${name}.`,
 					isSuccess: false,
 				});
 			}
@@ -53,7 +53,7 @@ export function PhoneButton({ phone, name }: { phone: string; name: string }) {
 			console.error('Call error:', error);
 			setAlertState({
 				isOpen: true,
-				message: `Error initiating call: ${error instanceof Error ? error.message : 'Unknown error'}`,
+				message: `Error initiating fraud alert call: ${error instanceof Error ? error.message : 'Unknown error'}`,
 				isSuccess: false,
 			});
 		} finally {
@@ -71,22 +71,22 @@ export function PhoneButton({ phone, name }: { phone: string; name: string }) {
 
 	return (
 		<>
-			<Button plain onClick={handleCallClick} disabled={isLoading || !phone} title={phone ? `Call ${name}` : 'No phone number available'}>
-				<PhoneIcon className="h-5 w-5 text-zinc-500 hover:text-zinc-700" />
+			<Button plain onClick={handleAlertClick} disabled={isLoading || !phone} title={phone ? `Send fraud alert call to ${name}` : 'No phone number available'}>
+				<ExclamationTriangleIcon className="h-5 w-5 text-red-500 hover:text-red-700" />
 			</Button>
 
 			{/* Confirmation Dialog */}
 			<Dialog open={isConfirmOpen} onClose={closeConfirmDialog}>
-				<DialogTitle>Confirm Call</DialogTitle>
+				<DialogTitle>Confirm Fraud Alert Call</DialogTitle>
 				<DialogDescription>
-					Are you sure you want to call {name} at {phone}?
+					Are you sure you want to send a <span className="font-bold text-red-600">fraud alert</span> call to {name} at {phone}?
 				</DialogDescription>
 				<DialogActions>
 					<Button onClick={closeConfirmDialog} plain>
 						Cancel
 					</Button>
-					<Button onClick={handleConfirmCall} color="blue">
-						Call
+					<Button onClick={handleConfirmAlert} color="red">
+						Send Alert
 					</Button>
 				</DialogActions>
 			</Dialog>
