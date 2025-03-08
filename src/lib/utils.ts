@@ -47,8 +47,20 @@ export function formatPhoneNumber(phone: string): string {
 
 	// If it starts with a plus, format international number
 	if (cleaned.startsWith('+')) {
-		// Format: +XX XXX XXX XXX
-		return cleaned.replace(/(\+\d{2})(\d{3})(\d{3})(\d{3})/, '$1 $2 $3 $4');
+		// Strip the plus sign
+		const withoutPlus = cleaned.substring(1);
+
+		// Get country code (everything except the last 9 digits)
+		const subscriberDigits = 9; // Standard length for many countries
+		const countryCode = withoutPlus.length > subscriberDigits ? withoutPlus.slice(0, withoutPlus.length - subscriberDigits) : '';
+
+		// Get subscriber number (last 9 digits or all if shorter)
+		const subscriberNumber = withoutPlus.slice(-Math.min(subscriberDigits, withoutPlus.length));
+
+		// Format subscriber number in groups of 3
+		const formatted = subscriberNumber.replace(/(\d{3})(?=\d)/g, '$1 ').trim();
+
+		return countryCode ? `+${countryCode} ${formatted}` : `+${formatted}`;
 	}
 
 	// If no plus, assume it's a local number and add spaces every 3 digits
