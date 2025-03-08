@@ -68,11 +68,10 @@ export async function POST(request: NextRequest) {
 		}
 
 		// 1. Get the NEXT_FIELD_UPDATE value from Airtable using the From number
-		const airtableGetResponse = await fetch(`${getBaseUrl()}/api/airtable/get/NEXT_FIELD_UPDATE?phone=${encodeURIComponent(from)}`, {
+		const airtableGetResponse = await fetch(`${getBaseUrl()}/api/airtable/get/NEXT_FIELD_UPDATE?phone=${encodeURIComponent(from)}&username=${username}&password=${password}`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
-				'Authorization': `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`,
 			},
 		});
 
@@ -95,13 +94,15 @@ export async function POST(request: NextRequest) {
 
 		// 2. Update the specified field with the SMS text (Body)
 		console.log(from, messageBody);
-		const updateResponse = await fetch(`${getBaseUrl()}/api/airtable/update/${fieldToUpdate}?phone=${encodeURIComponent(from)}&value=${encodeURIComponent(messageBody)}`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`,
+		const updateResponse = await fetch(
+			`${getBaseUrl()}/api/airtable/update/${fieldToUpdate}?phone=${encodeURIComponent(from)}&value=${encodeURIComponent(messageBody)}&username=${username}&password=${password}`,
+			{
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
 			},
-		});
+		);
 
 		if (!updateResponse.ok) {
 			throw new Error(`Failed to update Airtable: ${updateResponse.statusText}`);
