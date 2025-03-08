@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
 
 		// Create fields object with required and optional fields
 		const fields: Record<string, any> = {
-			Phone: phone,
+			Phone: decodeURIComponent(phone),
 		};
 
 		// Add name if provided

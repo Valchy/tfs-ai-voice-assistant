@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
 
 		// Create new client record
 		const createdRecord = await base('Clients').create({
-			Phone: phone,
+			Phone: decodeURIComponent(phone),
 		});
 
 		// Return the newly created client data
