@@ -146,23 +146,22 @@ export async function sendSmsMessage(phoneNumber: string, message: string): Prom
 	try {
 		console.log(`Sending SMS to phone number: ${phoneNumber} with message: ${message}`);
 
-		// Build the base URL for the Twilio SMS endpoint
-		const url = `${getBaseUrl()}/api/twilio/sms/send`;
-
 		// Get the auth credentials from environment variables
 		const username = process.env.NEXT_PUBLIC_BASIC_AUTH_USERNAME;
 		const password = process.env.NEXT_PUBLIC_BASIC_AUTH_PASSWORD;
 
-		// Create headers object with content type
+		// Build the base URL for the Twilio SMS endpoint with auth credentials in URL
+		let url = `${getBaseUrl()}/api/twilio/sms/send`;
+
+		// Add authentication credentials to URL if available
+		if (username && password) {
+			url += `?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`;
+		}
+
+		// Create headers object with content type only
 		const headers: HeadersInit = {
 			'Content-Type': 'application/json',
 		};
-
-		// Add Basic Auth header if credentials are available
-		if (username && password) {
-			const base64Credentials = base64Encode(`${username}:${password}`);
-			headers['Authorization'] = `Basic ${base64Credentials}`;
-		}
 
 		const response = await fetch(url, {
 			method: 'POST',

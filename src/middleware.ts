@@ -12,6 +12,9 @@ export function middleware(request: NextRequest) {
 	if (
 		request.nextUrl.pathname.startsWith('/api/twilio') ||
 		request.nextUrl.pathname.startsWith('/api/airtable/add/caller') ||
+		request.nextUrl.pathname.match(/^\/api\/airtable\/get\/.*$/) ||
+		request.nextUrl.pathname.match(/^\/api\/airtable\/get\/cards\/.*$/) ||
+		request.nextUrl.pathname.match(/^\/api\/airtable\/update\/.*$/) ||
 		request.nextUrl.pathname.match(/^\/api\/airtable\/get\/clients\/.*$/)
 	) {
 		const response = NextResponse.next();

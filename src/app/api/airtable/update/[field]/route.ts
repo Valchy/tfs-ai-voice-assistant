@@ -5,6 +5,20 @@ import { NextRequest, NextResponse } from 'next/server';
 const apiKey = process.env.AIRTABLE_API_KEY;
 const baseId = process.env.AIRTABLE_BASE_ID;
 
+// Get auth credentials from environment variables
+const AUTH_USERNAME = process.env.NEXT_PUBLIC_BASIC_AUTH_USERNAME;
+const AUTH_PASSWORD = process.env.NEXT_PUBLIC_BASIC_AUTH_PASSWORD;
+
+// Function to validate credentials
+function isValidAuth(username: string | null, password: string | null): boolean {
+	if (!AUTH_USERNAME || !AUTH_PASSWORD) {
+		console.error('Auth credentials not configured in environment variables');
+		return true; // Allow access if auth is not configured
+	}
+
+	return username === AUTH_USERNAME && password === AUTH_PASSWORD;
+}
+
 // Client type definition with index signature for TS safety
 type ClientRecord = {
 	id: string;
@@ -31,6 +45,21 @@ export async function POST(request: NextRequest, { params }: { params: { field: 
 		const url = new URL(request.url);
 		const phone = url.searchParams.get('phone');
 		const value = url.searchParams.get('value');
+		const username = url.searchParams.get('username');
+		const password = url.searchParams.get('password');
+
+		// Validate authentication if credentials are configured
+		if (AUTH_USERNAME && AUTH_PASSWORD) {
+			if (!isValidAuth(username, password)) {
+				return NextResponse.json(
+					{
+						success: false,
+						error: 'Unauthorized: Invalid credentials',
+					},
+					{ status: 401 },
+				);
+			}
+		}
 
 		// Validate required parameters
 		if (!phone) {
