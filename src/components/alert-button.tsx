@@ -71,7 +71,7 @@ export function AlertButton({ phone, card }: { phone: string; card: string }) {
 
 	return (
 		<>
-			<Button plain onClick={handleAlertClick} disabled={isLoading || !phone} title={phone ? `Send fraud alert call to ${name}` : 'No phone number available'}>
+			<Button plain onClick={handleAlertClick} disabled={isLoading || !phone} title={phone ? `Send fraud alert call to ${phone}` : 'No phone number available'}>
 				<ExclamationTriangleIcon className="h-5 w-5 text-red-500 hover:text-red-700" />
 			</Button>
 

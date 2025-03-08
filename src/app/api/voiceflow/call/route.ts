@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
 			},
 			body: JSON.stringify({
 				to: phoneNumber,
-				variables: { fraud_alert: fraudAlert, card_number: card },
+				variables: { fraud_alert: fraudAlert, user_card_number: card },
 			}),
 		});
 
