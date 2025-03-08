@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
 		const result = await client.messages.create({
 			body: message,
 			from: twilioPhoneNumber,
-			to: to,
+			to: decodeURIComponent(to),
 		});
 
 		// Return success response with message details
