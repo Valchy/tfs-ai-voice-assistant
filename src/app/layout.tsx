@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 	},
 	description: 'Valchy AI is a platform for managing your calls and leads.',
 	icons: {
-		icon: '/favicon.png',
+		icon: '/icon_valchy_white.png',
 	},
 };
 
