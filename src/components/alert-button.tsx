@@ -9,7 +9,7 @@ import { ExclamationTriangleIcon } from '@heroicons/react/20/solid';
 import { useState } from 'react';
 
 // Alert button component for fraud alerts
-export function AlertButton({ phone, card, name = '' }: { phone: string; card: string; name: string }) {
+export function AlertButton({ phone, card }: { phone: string; card: string }) {
 	const [isLoading, setIsLoading] = useState(false);
 	const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 	const [alertState, setAlertState] = useState<{
@@ -34,18 +34,18 @@ export function AlertButton({ phone, card, name = '' }: { phone: string; card: s
 
 		try {
 			// Make the call to the API using the centralized function with fraud_alert='yes'
-			const success = await initiateVoiceflowCall(phone, card, name, 'yes');
+			const success = await initiateVoiceflowCall({ phoneNumber: phone, card, fraudAlert: 'yes' });
 
 			if (success) {
 				setAlertState({
 					isOpen: true,
-					message: `Fraud alert call to ${name} initiated successfully.`,
+					message: `Fraud alert call to ${phone} initiated successfully.`,
 					isSuccess: true,
 				});
 			} else {
 				setAlertState({
 					isOpen: true,
-					message: `Failed to initiate fraud alert call to ${name}.`,
+					message: `Failed to initiate fraud alert call to ${phone}.`,
 					isSuccess: false,
 				});
 			}
@@ -79,7 +79,7 @@ export function AlertButton({ phone, card, name = '' }: { phone: string; card: s
 			<Dialog open={isConfirmOpen} onClose={closeConfirmDialog}>
 				<DialogTitle>Confirm Fraud Alert Call</DialogTitle>
 				<DialogDescription>
-					Are you sure you want to send a <span className="font-bold text-red-600">fraud alert</span> call to {name} at {phone}?
+					Are you sure you want to send a <span className="font-bold text-red-600">fraud alert</span> call to {phone}?
 				</DialogDescription>
 				<DialogActions>
 					<Button onClick={closeConfirmDialog} plain>
