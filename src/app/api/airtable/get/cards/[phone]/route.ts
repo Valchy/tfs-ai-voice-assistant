@@ -106,11 +106,32 @@ export async function GET(request: NextRequest, { params }: { params: { phone: s
 			...record.fields,
 		}));
 
+		// Extract card numbers from the records using the correct field name "Card Number"
+		const cardNumbers = records
+			.map(record => record.fields['Card Number'] || '')
+			.filter(Boolean)
+			.join(',');
+
+		// Extract just the last 4 digits of each card number
+		const cardNumberLastFourDigits = records
+			.map(record => {
+				const cardNumberField = record.fields['Card Number'];
+				// Convert to string and handle undefined/null
+				const cardNumberStr = cardNumberField ? String(cardNumberField) : '';
+				// Only get the last 4 digits if the card number has at least 4 digits
+				return cardNumberStr.length >= 4 ? cardNumberStr.slice(-4) : cardNumberStr;
+			})
+			.filter(Boolean)
+			.join(', ')
+			.replace(/,([^,]*)$/, ' and$1');
+
 		// Return the cards data
 		return NextResponse.json(
 			{
 				success: true,
 				data: data,
+				cardNumbers: cardNumbers, // Full card numbers as comma-separated string
+				cardNumberLastFourDigits: cardNumberLastFourDigits, // Last 4 digits as comma-separated string
 			},
 			{
 				headers: {
