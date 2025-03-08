@@ -19,7 +19,6 @@ type ClientItem = {
 	Passport: string;
 	['Date of Birth']: string;
 	'Card Number': string;
-	Address: string;
 	'Card Status': string[];
 };
 

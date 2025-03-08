@@ -46,6 +46,22 @@ export async function POST(request: NextRequest) {
 		// Format the phone number to search - keep only digits
 		const formattedPhoneNumber = phone.replace(/\D/g, '');
 
+		// Validate phone number length (more than 6 digits)
+		if (formattedPhoneNumber.length <= 6) {
+			return NextResponse.json(
+				{
+					success: false,
+					error: 'Phone number must be longer than 6 digits',
+				},
+				{
+					status: 400,
+					headers: {
+						'Cache-Control': 'no-store, max-age=0, must-revalidate',
+					},
+				},
+			);
+		}
+
 		console.log('Checking for client with phone:', phone, '=>', formattedPhoneNumber);
 
 		// Check if client already exists
