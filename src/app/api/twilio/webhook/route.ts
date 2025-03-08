@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
 		// 2. Update the specified field with the SMS text (Body)
 		console.log(from, messageBody);
 		const updateResponse = await fetch(
-			`${getBaseUrl()}/api/airtable/update/${fieldToUpdate}?phone=${encodeURIComponent(from)}&value=${encodeURIComponent(messageBody)}&username=${username}&password=${password}`,
+			`${getBaseUrl()}/api/airtable/update/client/${fieldToUpdate}?phone=${encodeURIComponent(from)}&value=${encodeURIComponent(messageBody)}&username=${username}&password=${password}`,
 			{
 				method: 'POST',
 				headers: {
