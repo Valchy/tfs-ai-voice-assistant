@@ -5,6 +5,20 @@ import { NextRequest, NextResponse } from 'next/server';
 const apiKey = process.env.AIRTABLE_API_KEY;
 const baseId = process.env.AIRTABLE_BASE_ID;
 
+// Get auth credentials from environment variables
+const AUTH_USERNAME = process.env.NEXT_PUBLIC_BASIC_AUTH_USERNAME;
+const AUTH_PASSWORD = process.env.NEXT_PUBLIC_BASIC_AUTH_PASSWORD;
+
+// Function to validate credentials
+function isValidAuth(username: string | null, password: string | null): boolean {
+	if (!AUTH_USERNAME || !AUTH_PASSWORD) {
+		console.error('Auth credentials not configured in environment variables');
+		return true; // Allow access if auth is not configured
+	}
+
+	return username === AUTH_USERNAME && password === AUTH_PASSWORD;
+}
+
 // Client type definition with index signature for TS safety
 type ClientRecord = {
 	id: string;
@@ -27,9 +41,11 @@ async function handleClientUpdate(request: NextRequest) {
 			);
 		}
 
-		// Parse URL-encoded form data
-		const formData = await request.formData();
-		const phone = formData.get('Phone')?.toString();
+		// Parse raw JSON data
+		const jsonData = await request.json();
+
+		// Case-insensitive search for phone field
+		const phone = jsonData.Phone || jsonData.phone;
 
 		// Validate phone number presence
 		if (!phone) {
@@ -43,14 +59,10 @@ async function handleClientUpdate(request: NextRequest) {
 		}
 
 		// Format the phone number to search - keep only digits
-		const formattedPhoneNumber = phone.replace(/\D/g, '');
+		const formattedPhoneNumber = phone.toString().replace(/\D/g, '');
 
-		// Extract all form data to update the client
-		const fields: Record<string, any> = {};
-		formData.forEach((value, key) => {
-			// Include all fields in the update
-			fields[key] = value;
-		});
+		// Extract all fields to update the client
+		const fields: Record<string, any> = { ...jsonData };
 
 		// Check if there are fields to update
 		if (Object.keys(fields).length === 0) {
@@ -145,10 +157,10 @@ async function handleClientUpdate(request: NextRequest) {
  * PUT /api/airtable/update/client
  *
  * Updates a client record in the Airtable 'Clients' table
- * Client is identified by phone number from the form data
- * All fields provided in the form data will be updated
+ * Client is identified by phone number from the JSON body
+ * All fields provided in the JSON will be updated
  *
- * Accepts x-www-form-urlencoded data
+ * Accepts raw JSON data
  */
 export async function PUT(request: NextRequest) {
 	return handleClientUpdate(request);
