@@ -33,8 +33,8 @@ export function AlertButton({ phone, card }: { phone: string; card: string }) {
 		setIsLoading(true);
 
 		try {
-			// Make the call to the API using the centralized function with fraud_alert='yes'
-			const success = await initiateVoiceflowCall({ phoneNumber: phone, card, fraudAlert: 'yes' });
+			// Make the call to the API using the centralized function
+			const success = await initiateVoiceflowCall({ phoneNumber: phone, card });
 
 			if (success) {
 				setAlertState({
