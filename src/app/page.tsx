@@ -16,10 +16,10 @@ import { Suspense } from 'react';
 // Map for Call Type styles
 const callTypeStyles: Record<string, { color: 'zinc' | 'indigo' | 'amber' | 'red' | 'sky' | 'green' }> = {
 	'No Action': { color: 'zinc' },
-	'Question Asked': { color: 'indigo' },
+	'Inquiry': { color: 'indigo' },
 	'Fraud Alert': { color: 'amber' },
-	'Card Blocked': { color: 'red' },
-	'Card Unblocked': { color: 'sky' },
+	'Card Block': { color: 'red' },
+	'Card Unblock': { color: 'sky' },
 	'Card Application': { color: 'green' },
 };
 

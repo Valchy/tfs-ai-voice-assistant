@@ -6,7 +6,7 @@ const apiKey = process.env.AIRTABLE_API_KEY;
 const baseId = process.env.AIRTABLE_BASE_ID;
 
 // Allowed call types based on the UI in the image
-const ALLOWED_CALL_TYPES = ['No Action', 'Card Blocked', 'Card Unblocked', 'Card Application', 'Question Asked', 'Fraud Alert'];
+const ALLOWED_CALL_TYPES = ['No Action', 'Card Block', 'Card Unblock', 'Card Application', 'Inquiry', 'Fraud Alert'];
 
 // Type definition for records
 type CallRecord = {

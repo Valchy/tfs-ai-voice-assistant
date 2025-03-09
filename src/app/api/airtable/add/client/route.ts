@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
 		}
 
 		// Format the phone number to search - keep only digits
-		const formattedPhoneNumber = phone.replace(/\D/g, '');
+		const formattedPhoneNumber = decodeURIComponent(phone);
 
 		// Validate phone number length (more than 6 digits)
 		if (formattedPhoneNumber.length <= 6) {
