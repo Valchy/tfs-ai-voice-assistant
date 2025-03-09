@@ -69,18 +69,14 @@ export async function GET(request: NextRequest, { params }: { params: { phone: s
 		// Decode the URL-encoded phone number and then format it
 		const decodedPhone = decodeURIComponent(phone);
 
-		// Format the phone number to search - keep only digits
-		// (this removes the '+' and any other non-digit characters)
-		const formattedPhoneNumber = decodedPhone.replace(/\D/g, '');
-
-		console.log('Searching for phone:', decodedPhone, '=>', formattedPhoneNumber);
+		console.log('Searching for phone:', phone, '=>', decodedPhone);
 
 		// Fetch records from the Clients table with exact phone number match
 		const records = await base('Clients')
 			.select({
 				filterByFormula: `OR(
-					SUBSTITUTE(Phone, "-", "") = "${formattedPhoneNumber}",
-					SUBSTITUTE(SUBSTITUTE(Phone, "+", ""), "-", "") = "${formattedPhoneNumber}"
+					SUBSTITUTE(Phone, "-", "") = "${decodedPhone}",
+					SUBSTITUTE(SUBSTITUTE(Phone, "+", ""), "-", "") = "${decodedPhone}"
 				)`,
 			})
 			.all();

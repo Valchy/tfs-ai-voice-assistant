@@ -44,10 +44,10 @@ export async function POST(request: NextRequest) {
 		}
 
 		// Format the phone number to search - keep only digits
-		const formattedPhoneNumber = decodeURIComponent(phone);
+		const decodedPhone = decodeURIComponent(phone);
 
 		// Validate phone number length (more than 6 digits)
-		if (formattedPhoneNumber.length <= 6) {
+		if (decodedPhone.length <= 6) {
 			return NextResponse.json(
 				{
 					success: false,
@@ -62,14 +62,14 @@ export async function POST(request: NextRequest) {
 			);
 		}
 
-		console.log('Checking for client with phone:', phone, '=>', formattedPhoneNumber);
+		console.log('Checking for client with phone:', phone, '=>', decodedPhone);
 
 		// Check if client already exists
 		const existingRecords = await base('Clients')
 			.select({
 				filterByFormula: `OR(
-          SUBSTITUTE(Phone, "-", "") = "${formattedPhoneNumber}",
-          SUBSTITUTE(SUBSTITUTE(Phone, "+", ""), "-", "") = "${formattedPhoneNumber}"
+          SUBSTITUTE(Phone, "-", "") = "${decodedPhone}",
+          SUBSTITUTE(SUBSTITUTE(Phone, "+", ""), "-", "") = "${decodedPhone}"
         )`,
 			})
 			.all();

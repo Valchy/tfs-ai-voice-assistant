@@ -59,7 +59,7 @@ async function handleClientUpdate(request: NextRequest) {
 		}
 
 		// Format the phone number to search - keep only digits
-		const formattedPhoneNumber = phone.toString().replace(/\D/g, '');
+		const decodedPhone = decodeURIComponent(phone);
 
 		// Extract all fields to update the client
 		const fields: Record<string, any> = { ...jsonData };
@@ -82,8 +82,8 @@ async function handleClientUpdate(request: NextRequest) {
 		const existingRecords = await base('Clients')
 			.select({
 				filterByFormula: `OR(
-          SUBSTITUTE(Phone, "-", "") = "${formattedPhoneNumber}",
-          SUBSTITUTE(SUBSTITUTE(Phone, "+", ""), "-", "") = "${formattedPhoneNumber}"
+          SUBSTITUTE(Phone, "-", "") = "${decodedPhone}",
+          SUBSTITUTE(SUBSTITUTE(Phone, "+", ""), "-", "") = "${decodedPhone}"
         )`,
 				maxRecords: 1,
 			})
