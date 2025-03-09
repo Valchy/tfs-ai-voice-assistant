@@ -116,10 +116,13 @@ export async function GET(request: NextRequest, { params }: { params: { phone: s
 		const cardNumberLastFourDigits = records
 			.map(record => {
 				const cardNumberField = record.fields['Card Number'];
+				const cardType = record.fields['Type'] || 'Card'; // Default to 'Card' if type is not available
 				// Convert to string and handle undefined/null
 				const cardNumberStr = cardNumberField ? String(cardNumberField) : '';
 				// Only get the last 4 digits if the card number has at least 4 digits
-				return cardNumberStr.length >= 4 ? cardNumberStr.slice(-4) : cardNumberStr;
+				const lastFourDigits = cardNumberStr.length >= 4 ? cardNumberStr.slice(-4) : cardNumberStr;
+				// Return the card type and last 4 digits format
+				return lastFourDigits ? `${cardType} card ending in ${lastFourDigits}` : '';
 			})
 			.filter(Boolean)
 			.join(', ')
