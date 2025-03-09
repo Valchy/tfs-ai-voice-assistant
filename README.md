@@ -1,15 +1,5 @@
-# Catalyst Demo
+# TFS AI Financial Service Assistant
 
-To run the Catalyst demo, first install the npm dependencies:
+This is my submission to the $1000 Voiceflow Voice AI Competition.
 
-```bash
-npm install
-```
-
-Next, run the development server:
-
-```bash
-npm run dev
-```
-
-Finally, open [http://localhost:3000](http://localhost:3000) in your browser to view the website.
+By: Valeri Sabev
