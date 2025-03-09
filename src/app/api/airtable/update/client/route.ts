@@ -62,7 +62,7 @@ async function handleClientUpdate(request: NextRequest) {
 		const decodedPhone = decodeURIComponent(phone);
 
 		// Extract all fields to update the client
-		const fields: Record<string, any> = { ...jsonData };
+		const fields: Record<string, any> = { ...jsonData, Phone: decodedPhone };
 
 		// Check if there are fields to update
 		if (Object.keys(fields).length === 0) {
