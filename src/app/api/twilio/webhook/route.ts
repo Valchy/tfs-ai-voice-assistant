@@ -67,35 +67,9 @@ export async function POST(request: NextRequest) {
 			);
 		}
 
-		// 1. Get the NEXT_FIELD_UPDATE value from Airtable using the From number
-		const airtableGetResponse = await fetch(`${getBaseUrl()}/api/airtable/get/NEXT_FIELD_UPDATE?phone=${encodeURIComponent(from)}&username=${username}&password=${password}`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		});
-
-		if (!airtableGetResponse.ok) {
-			throw new Error(`Failed to get Airtable data: ${airtableGetResponse.statusText}`);
-		}
-
-		const airtableGetData = await airtableGetResponse.json();
-		const fieldToUpdate = airtableGetData.data;
-
-		if (!fieldToUpdate) {
-			return NextResponse.json(
-				{
-					success: false,
-					error: 'No NEXT_FIELD_UPDATE value found for client',
-				},
-				{ status: 404 },
-			);
-		}
-
-		// 2. Update the specified field with the SMS text (Body)
 		console.log(from, messageBody);
 		const updateResponse = await fetch(
-			`${getBaseUrl()}/api/airtable/update/client/${fieldToUpdate}?phone=${encodeURIComponent(from)}&value=${encodeURIComponent(messageBody)}&username=${username}&password=${password}`,
+			`${getBaseUrl()}/api/airtable/update/client/CARD_APPLICATION_DATA?phone=${encodeURIComponent(from)}&value=${encodeURIComponent(messageBody)}&username=${username}&password=${password}`,
 			{
 				method: 'POST',
 				headers: {
@@ -110,11 +84,11 @@ export async function POST(request: NextRequest) {
 
 		const updateData = await updateResponse.json();
 
-		// 3. Return success response with updated data
+		// Return success response with updated data
 		return NextResponse.json(
 			{
 				success: true,
-				message: `Successfully processed SMS and updated ${fieldToUpdate} field`,
+				message: `Successfully processed SMS and updated CARD_APPLICATION_DATA field`,
 				smsText: messageBody,
 				updatedData: updateData.data,
 				body: bodyData,
