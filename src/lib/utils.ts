@@ -36,16 +36,19 @@ export function formatCardNumber(cardNumber: string): string {
 }
 
 /**
- * Formats a phone number in international format
+ * Formats a phone number to show only country code and last 3 digits
  * @param phone The raw phone number string
- * @returns Formatted phone number
+ * @returns Masked phone number with only country code and last 3 digits visible
  */
 export function formatPhoneNumber(phone: string): string {
 	if (!phone) return '-';
 	// Remove any non-digit characters except plus sign
 	const cleaned = phone.replace(/[^\d+]/g, '');
 
-	// If it starts with a plus, format international number
+	// If no digits, return cleaned version
+	if (!cleaned.replace(/\+/g, '').length) return cleaned || '-';
+
+	// If it starts with a plus, handle as international number
 	if (cleaned.startsWith('+')) {
 		// Strip the plus sign
 		const withoutPlus = cleaned.substring(1);
@@ -54,15 +57,14 @@ export function formatPhoneNumber(phone: string): string {
 		const subscriberDigits = 9; // Standard length for many countries
 		const countryCode = withoutPlus.length > subscriberDigits ? withoutPlus.slice(0, withoutPlus.length - subscriberDigits) : '';
 
-		// Get subscriber number (last 9 digits or all if shorter)
-		const subscriberNumber = withoutPlus.slice(-Math.min(subscriberDigits, withoutPlus.length));
+		// Get last 3 digits
+		const last3Digits = cleaned.slice(-3);
 
-		// Format subscriber number in groups of 3
-		const formatted = subscriberNumber.replace(/(\d{3})(?=\d)/g, '$1 ').trim();
-
-		return countryCode ? `+${countryCode} ${formatted}` : `+${formatted}`;
+		// Return masked format
+		return `+${countryCode} •••• •••• ${last3Digits}`;
 	}
 
-	// If no plus, assume it's a local number and add spaces every 3 digits
-	return cleaned.replace(/(\d{3})(?=\d)/g, '$1 ');
+	// If no plus sign (local number), just show last 3 digits
+	const last3Digits = cleaned.slice(-3);
+	return `•••• •••• ${last3Digits}`;
 }
