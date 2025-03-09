@@ -28,6 +28,13 @@ async function CallerHistoryContent() {
 	const callerHistory = await getCallerHistory();
 	console.log(`Rendering caller history with ${callerHistory.length} records`);
 
+	// Sort the caller history by date from most recent to oldest
+	const sortedCallerHistory = [...callerHistory].sort((a, b) => {
+		const dateA = new Date(a.Date || '').getTime();
+		const dateB = new Date(b.Date || '').getTime();
+		return dateB - dateA; // Descending order (most recent first)
+	});
+
 	return (
 		<>
 			<div className="mt-4 grid gap-8 sm:grid-cols-2 xl:grid-cols-4">
@@ -49,8 +56,8 @@ async function CallerHistoryContent() {
 					</TableRow>
 				</TableHead>
 				<TableBody>
-					{callerHistory.length > 0 ? (
-						callerHistory.map(caller => (
+					{sortedCallerHistory.length > 0 ? (
+						sortedCallerHistory.map(caller => (
 							<TableRow key={caller.id} title={`Caller: ${caller.Name || '-'}`}>
 								<TableCell>{caller.Name || '-'}</TableCell>
 								<TableCell>{formatPhoneNumber(caller.Phone)}</TableCell>
