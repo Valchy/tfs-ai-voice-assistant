@@ -60,8 +60,10 @@ export async function POST(request: NextRequest) {
 			status = formData.get('status')?.toString() || 'Active';
 		}
 
+		const decodedPhone = decodeURIComponent(phone);
+
 		// Validate required fields
-		if (!phone || !status || !type) {
+		if (!decodedPhone || !status || !type) {
 			return NextResponse.json(
 				{
 					success: false,
@@ -108,9 +110,6 @@ export async function POST(request: NextRequest) {
 			);
 		}
 
-		// Format the phone
-		const formattedPhone = phone.trim();
-
 		// Generate a unique card number
 		let formattedCardNumber = '';
 		let isUnique = false;
@@ -139,7 +138,7 @@ export async function POST(request: NextRequest) {
 
 		console.log('Adding new card:', {
 			'Card Number': formattedCardNumber,
-			Phone: formattedPhone,
+			Phone: decodedPhone,
 			Status: status,
 			Type: type,
 		});
@@ -147,7 +146,7 @@ export async function POST(request: NextRequest) {
 		// Create new card record
 		const createdRecord = await base('Cards').create({
 			'Card Number': formattedCardNumber,
-			Phone: formattedPhone,
+			Phone: decodedPhone,
 			Status: status,
 			Type: type,
 		});
